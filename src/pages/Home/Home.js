@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Box, 
   Button, 
@@ -18,8 +18,6 @@ import {
   useMediaQuery,
   Fade,
   Grow,
-  Zoom,
-  useScrollTrigger,
   Chip
 } from '@mui/material';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -30,12 +28,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import AppointmentModal from '../../components/AppointmentModal/AppointmentModal';
 import { 
   CheckCircle as CheckCircleIcon, 
-  Email as EmailIcon,
-  Gavel as GavelIcon,
-  AccountBalance as AccountBalanceIcon,
-  Description as DescriptionIcon,
   ArrowForward as ArrowForwardIcon,
-  Star as StarIcon,
   People as PeopleIcon,
   VerifiedUser as VerifiedUserIcon,
   Receipt as ReceiptIcon,
@@ -110,26 +103,26 @@ const features = [
 ];
 
 // Testimonials data
-const testimonials = [
-  {
-    name: 'Maria G.',
-    role: 'Small Business Owner',
-    content: 'Eagle Vision helped me with my business taxes and saved me thousands. Their team is knowledgeable and professional.',
-    rating: 5
-  },
-  {
-    name: 'James R.',
-    role: 'Individual Taxpayer',
-    content: 'The best tax service I\'ve ever used. They made the process so easy and got me a much bigger refund than I expected!',
-    rating: 5
-  },
-  {
-    name: 'Sofia M.',
-    role: 'Immigration Client',
-    content: 'They guided me through the entire green card process. Couldn\'t have done it without their expertise and support.',
-    rating: 5
-  }
-];
+// const testimonials = [
+//   {
+//     name: 'Maria G.',
+//     role: 'Small Business Owner',
+//     content: 'Eagle Vision helped me with my business taxes and saved me thousands. Their team is knowledgeable and professional.',
+//     rating: 5
+//   },
+//   {
+//     name: 'James R.',
+//     role: 'Individual Taxpayer',
+//     content: 'The best tax service I\'ve ever used. They made the process so easy and got me a much bigger refund than I expected!',
+//     rating: 5
+//   },
+//   {
+//     name: 'Sofia M.',
+//     role: 'Immigration Client',
+//     content: 'They guided me through the entire green card process. Couldn\'t have done it without their expertise and support.',
+//     rating: 5
+//   }
+// ];
 
 const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -149,7 +142,8 @@ const Home = () => {
   };
   
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  // Media query for responsive design
+  useMediaQuery(theme.breakpoints.down('md'));
   
   // Testimonials section has been removed
 
