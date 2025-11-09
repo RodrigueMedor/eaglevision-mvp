@@ -1,7 +1,7 @@
 import React from 'react';
-import { Box, Container, Typography, Grid, List, ListItem, ListItemText, Paper, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Container, Typography, Grid, List, Paper, useMediaQuery, useTheme, Link } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import { Phone, Email, LocationOn, CheckCircle } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 
 const team = [
