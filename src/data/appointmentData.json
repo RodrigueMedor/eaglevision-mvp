@@ -1,0 +1,67 @@
+{
+  "services": [
+    "Tax Preparation",
+    "Tax Planning",
+    "Tax Resolution",
+    "Immigration Consultation",
+    "Green Card Application",
+    "Citizenship Application",
+    "Work Visa",
+    "Business Formation",
+    "Bookkeeping",
+    "Other"
+  ],
+  "businessHours": {
+    "monday": { "open": "09:00", "close": "17:00" },
+    "tuesday": { "open": "09:00", "close": "17:00" },
+    "wednesday": { "open": "09:00", "close": "17:00" },
+    "thursday": { "open": "09:00", "close": "17:00" },
+    "friday": { "open": "09:00", "close": "17:00" },
+    "saturday": { "open": "10:00", "close": "14:00" },
+    "sunday": { "closed": true }
+  },
+  "unavailableDates": [
+    "2025-11-28", // Thanksgiving
+    "2025-12-24", // Christmas Eve
+    "2025-12-25", // Christmas Day
+    "2026-01-01"  // New Year's Day
+  ],
+  "appointmentTypes": {
+    "Tax Preparation": 60,
+    "Tax Planning": 60,
+    "Tax Resolution": 90,
+    "Immigration Consultation": 60,
+    "Green Card Application": 90,
+    "Citizenship Application": 60,
+    "Work Visa": 60,
+    "Business Formation": 60,
+    "Bookkeeping": 90,
+    "Other": 60
+  },
+  "sampleAppointments": [
+    {
+      "id": 1,
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john.doe@example.com",
+      "phone": "(555) 123-4567",
+      "service": "Tax Preparation",
+      "date": "2025-12-15",
+      "time": "14:00",
+      "status": "confirmed",
+      "notes": "Need help with 2024 tax return"
+    },
+    {
+      "id": 2,
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "email": "jane.smith@example.com",
+      "phone": "(555) 987-6543",
+      "service": "Green Card Application",
+      "date": "2025-12-16",
+      "time": "10:30",
+      "status": "pending",
+      "notes": "Marriage-based green card application"
+    }
+  ]
+}
