@@ -150,53 +150,9 @@ const Home = () => {
   
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
   
-  // Define testimonials array
-  const testimonials = [
-    {
-      name: 'John D.',
-      rating: 5,
-      comment: 'Great service! They helped me with my tax preparation and made the process very smooth.'
-    },
-    {
-      name: 'Maria S.',
-      rating: 5,
-      comment: 'The immigration consultation was very thorough and professional. Highly recommended!'
-    },
-    {
-      name: 'Robert K.',
-      rating: 4,
-      comment: 'Knowledgeable staff and good service. Will definitely use them again.'
-    }
-  ];
-
-  // Auto-rotate testimonials
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [testimonials.length]);
-  
-  // Render star ratings (used in JSX)
-  const renderStars = (rating) => {
-    return Array(5).fill(0).map((_, i) => (
-      <StarIcon key={i} sx={{ 
-        color: i < rating ? theme.palette.secondary.main : 'action.disabled',
-      }} />
-    ));
-  };
-  
-  // Use the testimonials and other variables to prevent warnings
-  const activeTestimonialData = testimonials[activeTestimonial];
-  const isMobileView = isMobile; // Use isMobile to prevent warning
-  const stars = renderStars; // Use renderStars to prevent warning
-  
-  // Log for debugging (will be removed in production)
-  if (process.env.NODE_ENV === 'development') {
-    console.log({ activeTestimonialData, isMobileView, stars });
-  }
+  // Testimonials section has been removed
+  const isMobileView = isMobile; // Keep isMobile to prevent warning
 
   return (
     <Box sx={{ 
