@@ -152,7 +152,6 @@ const Home = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
   // Testimonials section has been removed
-  const isMobileView = isMobile; // Keep isMobile to prevent warning
 
   return (
     <Box sx={{ 
