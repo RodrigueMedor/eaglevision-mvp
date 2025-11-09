@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, List, Paper, useMediaQuery, useTheme, Link } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
 import { Phone, Email, LocationOn, CheckCircle } from '@mui/icons-material';
 import Button from '@mui/material/Button';
 
