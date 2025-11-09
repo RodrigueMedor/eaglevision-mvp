@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Typography, Box, Paper, Link } from '@mui/material';
+import { Container, Typography, Box, Paper } from '@mui/material';
 
 const Terms = () => {
   return (
@@ -125,7 +125,7 @@ const Terms = () => {
             123 Business Street<br />
             City, State ZIP<br />
             Phone: (641) 451-4536<br />
-            Email: info@eaglevisionedge.com
+            <a href="mailto:info@eaglevisionedge.com" style={{ color: 'inherit' }}>info@eaglevisionedge.com</a>
           </Typography>
         </Box>
       </Paper>
