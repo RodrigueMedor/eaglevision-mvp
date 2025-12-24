@@ -2,9 +2,10 @@
 build:
   os: ubuntu20.04
   packages:
-    - python3.10
-    - python3.10-dev
-    - python3.10-venv
+    - python3.9
+    - python3.9-dev
+    - python3.9-venv
+    - python3.9-distutils
     - gcc
     - g++
     - make
@@ -42,13 +43,13 @@ services:
   # Backend Service
   - type: web
     name: eaglevision-backend
-    env: python3.10
+    env: python3.9
     buildCommand: |
-      python3.10 -m pip install --upgrade pip setuptools wheel
-      python3.10 -m pip install --no-cache-dir -r src/requirements.txt
-      python3.10 -m pip install gunicorn uvicorn[standard]
+      python3.9 -m pip install --upgrade pip setuptools wheel
+      python3.9 -m pip install --no-cache-dir -r src/requirements.txt
+      python3.9 -m pip install gunicorn uvicorn[standard]
       # Run database migrations
-      cd src && python3.10 -m alembic upgrade head
+      cd src && python3.9 -m alembic upgrade head
     startCommand: gunicorn src.main:app --chdir src --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:10000
     envVars:
       - key: PYTHON_VERSION
