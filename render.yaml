@@ -1,3 +1,19 @@
+# ===========================================
+# Global Settings
+# ===========================================
+global:
+  autoDeploy: true
+  buildCaching: true
+  region: oregon
+  envVars:
+    - key: NODE_ENV
+      value: production
+    - key: PYTHONUNBUFFERED
+      value: "1"
+
+# ===========================================
+# Services
+# ===========================================
 services:
   # ============================
   # Frontend – React (Static)
@@ -6,14 +22,37 @@ services:
     name: eaglevision-frontend
     rootDir: frontend
     buildCommand: |
-      npm install
+      npm ci --prefer-offline
       npm run build
     staticPublishPath: build
     envVars:
       - key: NODE_VERSION
-        value: "20"
+        value: "20.x"
       - key: REACT_APP_API_URL
         value: https://eaglevision-backend.onrender.com
+      - key: GENERATE_SOURCEMAP
+        value: "false"
+    autoDeploy: true
+    buildCaching: true
+    routes:
+      - type: rewrite
+        source: "/*"
+        destination: "/index.html"
+    headers:
+      - source: "/*"
+        headers:
+          - key: "X-Frame-Options"
+            value: "DENY"
+          - key: "X-Content-Type-Options"
+            value: "nosniff"
+          - key: "Referrer-Policy"
+            value: "strict-origin-when-cross-origin"
+          - key: "Permissions-Policy"
+            value: "camera=(), microphone=(), geolocation=()"
+      - source: "/static/*"
+        headers:
+          - key: "Cache-Control"
+            value: "public, max-age=31536000, immutable"
 
   # ============================
   # Backend – FastAPI (Python)
@@ -23,53 +62,157 @@ services:
     env: python
     rootDir: src
     plan: free
+    region: oregon
     buildCommand: |
-      pip install --upgrade pip
-      pip install -r requirements.txt
+      python -m pip install --upgrade pip
+      pip install -r requirements.txt --no-cache-dir
+      python -m pip install gunicorn
     startCommand: >
       gunicorn main:app
       --workers 4
       --worker-class uvicorn.workers.UvicornWorker
-      --bind 0.0.0.0:10000
+      --bind 0.0.0.0:$PORT
+      --timeout 120
+      --keep-alive 5
+      --log-level info
+      --access-logfile -
+      --error-logfile -
     envVars:
       - key: PORT
         value: "10000"
+      - key: PYTHON_VERSION
+        value: "3.10"
+      - key: PYTHONPATH
+        value: "/opt/render/project/src"
+      - key: ENVIRONMENT
+        value: "production"
+      - key: LOG_LEVEL
+        value: "INFO"
 
-      - key: PYTHONUNBUFFERED
-        value: "1"
+      # Security
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "1440"
+      - key: ALGORITHM
+        value: "HS256"
+      - key: SECURE_COOKIES
+        value: "true"
+      - key: SECURITY_HEADERS
+        value: "true"
 
-      # ===== Database =====
+      # Database
       - key: DATABASE_URL
         fromDatabase:
           name: eaglevision-db
           property: connectionString
+      - key: DATABASE_POOL_SIZE
+        value: "5"
+      - key: DATABASE_MAX_OVERFLOW
+        value: "10"
 
-      # ===== Security =====
-      - key: SECRET_KEY
-        generateValue: true
-
-      # ===== CORS =====
+      # CORS
       - key: CORS_ORIGINS
-        value: https://eaglevision-frontend.onrender.com
+        value: "https://eaglevision-frontend.onrender.com,http://localhost:3000"
+      - key: CORS_METHODS
+        value: "GET,POST,PUT,DELETE,OPTIONS"
+      - key: CORS_HEADERS
+        value: "Content-Type,Authorization,X-Requested-With"
 
-      # ===== Redis =====
+      # Redis
       - key: REDIS_URL
         fromService:
           name: eaglevision-redis
           property: connectionString
+      - key: REDIS_EXPIRE_SECONDS
+        value: "86400"
 
+    # Health checks
+    healthCheckPath: /health
+    healthCheckTimeoutSeconds: 5
+    autoDeploy: true
+    buildCaching: true
+    instanceSize: free
+    numInstances: 1
+
+    # Resource limits
+    resources:
+      cpu: 1.0
+      memoryGB: 1.0
+
+    # Auto-scaling
+    autoScaling:
+      minInstances: 1
+      maxInstances: 3
+      targetCPUUtilization: 70
+      targetMemoryUtilization: 80
+
+    # Disk
+    disk:
+      name: eaglevision-disk
+      mountPath: /opt/render/project/src/uploads
+      sizeGB: 1
+
+# ===========================================
+# Data Services
+# ===========================================
   # ============================
   # Redis
   # ============================
   - type: redis
     name: eaglevision-redis
     plan: free
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList:
+      - 0.0.0.0/0
+    persistence: false
+    alertWhenExceeded: true
+    alertThreshold: 80
 
-# ============================
-# PostgreSQL Database
-# ============================
+# ===========================================
+# Databases
+# ===========================================
 databases:
   - name: eaglevision-db
     databaseName: eaglevision
     user: eaglevision_user
     plan: free
+    region: oregon
+    ipAllowList:
+      - 0.0.0.0/0
+    extensions:
+      - pg_trgm
+      - btree_gin
+      - uuid-ossp
+    maintenanceWindow: "sunday:03:00"
+    backupRetention: 7
+    alertWhenExceeded: true
+    alertThreshold: 80
+
+# ===========================================
+# Custom Domains (uncomment and configure as needed)
+# ===========================================
+# customDomains:
+#   - name: www.example.com
+#     domainType: apex
+#   - name: api.example.com
+#     domainType: subdomain
+#     service: eaglevision-backend
+
+# ===========================================
+# Environment Groups
+# ===========================================
+envGroups:
+  - name: production
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+
+  - name: staging
+    envVars:
+      - key: ENVIRONMENT
+        value: staging
+      - key: LOG_LEVEL
+        value: DEBUG
