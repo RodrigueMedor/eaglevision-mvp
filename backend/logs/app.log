@@ -33,3 +33,7 @@ Traceback (most recent call last):
     raise HTTPException(
 fastapi.exceptions.HTTPException
 2025-12-24 09:51:33,560 - backend.security - WARNING - Request error
+2025-12-24 10:27:08,817 - uvicorn.error - INFO - Shutting down
+2025-12-24 10:27:08,940 - uvicorn.error - INFO - Waiting for application shutdown.
+2025-12-24 10:27:08,951 - uvicorn.error - INFO - Application shutdown complete.
+2025-12-24 10:27:08,951 - uvicorn.error - INFO - Finished server process [85244]

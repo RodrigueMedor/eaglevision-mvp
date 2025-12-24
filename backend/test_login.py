@@ -1,7 +1,12 @@
 import sys
 import os
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
+
+# Add the backend directory to the Python path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+# Now import the auth module
 from backend.auth import verify_password, get_password_hash
 
 # Database connection
@@ -12,11 +17,14 @@ db = Session()
 
 try:
     # Get the admin user
-    result = db.execute("""
-        SELECT id, email, hashed_password, is_active, is_verified 
-        FROM users 
-        WHERE email = 'admin@eaglevision.com'
-    """)
+    result = db.execute(
+        text("""
+            SELECT id, email, hashed_password, is_active, is_verified 
+            FROM users 
+            WHERE email = :email
+        """),
+        {"email": "admin@eaglevision.com"}
+    )
     
     admin = result.first()
     
@@ -43,7 +51,7 @@ try:
         update = input("\nWould you like to update the password hash? (y/n): ")
         if update.lower() == 'y':
             db.execute(
-                "UPDATE users SET hashed_password = :hash WHERE id = :id",
+                text("UPDATE users SET hashed_password = :hash WHERE id = :id"),
                 {"hash": new_hash, "id": admin[0]}
             )
             db.commit()
