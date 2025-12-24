@@ -1,77 +1,75 @@
-# Build configuration
-build:
-  os: ubuntu20.04
-  packages:
-    - python3.9
-    - python3.9-dev
-    - python3.9-venv
-    - python3.9-distutils
-    - libpython3.9-dev
-    - gcc
-    - g++
-    - make
-    - build-essential
-    - python3-dev
-
 services:
-  # Frontend Service
-  - type: web
+  # ============================
+  # Frontend – React (Static)
+  # ============================
+  - type: static
     name: eaglevision-frontend
-    env: node
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: "./frontend/build"
+    rootDir: frontend
+    buildCommand: |
+      npm install
+      npm run build
+    staticPublishPath: build
     envVars:
       - key: NODE_VERSION
-        value: 22.16.0
+        value: "20"
       - key: REACT_APP_API_URL
-        value: https://eaglevision-backend.onrender.com  # Update this to your backend URL
+        value: https://eaglevision-backend.onrender.com
 
-  # Backend Service
+  # ============================
+  # Backend – FastAPI (Python)
+  # ============================
   - type: web
     name: eaglevision-backend
-    env: python3.9
+    env: python
+    rootDir: src
+    plan: free
     buildCommand: |
-      python3.9 -m pip install --upgrade pip setuptools wheel
-      python3.9 -m pip install --no-cache-dir --only-binary :all: -r src/requirements.txt
-      python3.9 -m pip install --only-binary :all: gunicorn uvicorn[standard]
-      # Run database migrations
-      cd src && python3.9 -m alembic upgrade head
-    startCommand: gunicorn src.main:app --chdir src --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:10000
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: >
+      gunicorn main:app
+      --workers 4
+      --worker-class uvicorn.workers.UvicornWorker
+      --bind 0.0.0.0:10000
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.9.0
       - key: PORT
-        value: 10000
+        value: "10000"
+
       - key: PYTHONUNBUFFERED
-        value: true
-      # Database configuration
+        value: "1"
+
+      # ===== Database =====
       - key: DATABASE_URL
         fromDatabase:
           name: eaglevision-db
           property: connectionString
-      # Security
+
+      # ===== Security =====
       - key: SECRET_KEY
         generateValue: true
-      - key: ACCESS_TOKEN_EXPIRE_MINUTES
-        value: "60"
-      - key: REFRESH_TOKEN_EXPIRE_DAYS
-        value: "30"
-      # CORS - Update with your frontend URL after deployment
+
+      # ===== CORS =====
       - key: CORS_ORIGINS
-        value: "https://your-frontend-url.onrender.com"
-      # Redis (for rate limiting and token blacklist)
+        value: https://eaglevision-frontend.onrender.com
+
+      # ===== Redis =====
       - key: REDIS_URL
         fromService:
-          name: redis
+          name: eaglevision-redis
           property: connectionString
 
-  # Redis Service
+  # ============================
+  # Redis
+  # ============================
   - type: redis
-    name: redis
-    plan: free  # or choose a paid plan for production
+    name: eaglevision-redis
+    plan: free
 
+# ============================
+# PostgreSQL Database
+# ============================
 databases:
   - name: eaglevision-db
     databaseName: eaglevision
     user: eaglevision_user
-    plan: free  # or choose a paid plan for production
+    plan: free
