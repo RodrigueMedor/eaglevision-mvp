@@ -27,6 +27,44 @@
     <title>Eagle Vision Edge</title>
   </head>
   <body>
+    <script>
+      // Completely disable error handling from content scripts
+      Object.defineProperty(window, 'addEventListener', {
+        value: function(type, listener, options) {
+          // Skip if this is the extension's error handler
+          if (type === 'error' && 
+              typeof listener === 'function' && 
+              (listener.toString().includes('content_script.js') || 
+               (arguments[1] && arguments[1].toString().includes('content_script.js')))) {
+            return function() {};
+          }
+          return EventTarget.prototype.addEventListener.apply(this, arguments);
+        },
+        writable: true,
+        configurable: true
+      });
+
+      // Override the error event completely
+      const originalErrorFn = console.error;
+      console.error = function() {
+        if (arguments[0] && 
+            typeof arguments[0] === 'string' && 
+            arguments[0].includes('content_script.js')) {
+          return; // Skip logging extension errors
+        }
+        return originalErrorFn.apply(console, arguments);
+      };
+
+      // Block the specific error
+      window.onerror = function(message, source, lineno, colno, error) {
+        if (source && (source.includes('content_script.js') || 
+                       (message && message.toString().includes('control')))) {
+          console.log('Browser extension error suppressed');
+          return true; // Suppress error
+        }
+        return false; // Allow other errors
+      };
+    </script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <!--
