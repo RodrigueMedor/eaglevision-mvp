@@ -10,22 +10,6 @@ build:
     - g++
     - make
     - build-essential
-    - libssl-dev
-    - zlib1g-dev
-    - libbz2-dev
-    - libreadline-dev
-    - libsqlite3-dev
-    - wget
-    - curl
-    - llvm
-    - libncurses5-dev
-    - libncursesw5-dev
-    - xz-utils
-    - tk-dev
-    - libffi-dev
-    - liblzma-dev
-    - python-openssl
-    - git
 
 services:
   # Frontend Service
@@ -46,14 +30,14 @@ services:
     env: python3.9
     buildCommand: |
       python3.9 -m pip install --upgrade pip setuptools wheel
-      python3.9 -m pip install --no-cache-dir -r src/requirements.txt
-      python3.9 -m pip install gunicorn uvicorn[standard]
+      python3.9 -m pip install --no-cache-dir --only-binary :all: -r src/requirements.txt
+      python3.9 -m pip install --only-binary :all: gunicorn uvicorn[standard]
       # Run database migrations
       cd src && python3.9 -m alembic upgrade head
     startCommand: gunicorn src.main:app --chdir src --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:10000
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.0
+        value: 3.9.0
       - key: PORT
         value: 10000
       - key: PYTHONUNBUFFERED
