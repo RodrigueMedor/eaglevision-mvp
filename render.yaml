@@ -1,3 +1,15 @@
+# Build configuration
+build:
+  os: ubuntu20.04
+  packages:
+    - python3-dev
+    - gcc
+    - g++
+    - build-essential
+    - libssl-dev
+    - libffi-dev
+    - python3-pip
+
 services:
   # Frontend Service
   - type: web
