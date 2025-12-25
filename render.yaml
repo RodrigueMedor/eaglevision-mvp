@@ -64,6 +64,7 @@ services:
     plan: free
     region: oregon
     buildCommand: |
+      apt-get update && apt-get install -y python3-dev gcc
       python -m pip install --upgrade pip
       pip install -r requirements.txt --no-cache-dir
       python -m pip install gunicorn
