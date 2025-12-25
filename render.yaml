@@ -67,10 +67,11 @@ services:
       apt-get update && apt-get install -y python3-dev gcc build-essential
       python -m pip install --upgrade pip
       pip install --upgrade setuptools wheel
-      # Install httptools with a pre-built wheel to avoid compilation
-      pip install httptools==0.6.1 --no-binary=:all: || pip install httptools==0.6.1 --only-binary=:all:
+      # Install requirements with h11 instead of httptools
       pip install -r requirements.txt --no-cache-dir
       python -m pip install gunicorn
+      # Ensure we're using h11 explicitly
+      pip install h11>=0.14.0
     startCommand: >
       gunicorn main:app
       --workers 4
