@@ -14,21 +14,24 @@ const { db, admin, verifyToken } = firebase;
 const app = express();
 const router = express.Router();
 
-// Apply middleware to the router
-router.use(cors({
+// Apply CORS middleware at the app level to handle preflight requests
+app.use(cors({
   origin: process.env.FRONTEND_URL || '*',
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Handle preflight requests
+app.options('*', cors());
+
 // Health check endpoint
-router.get('/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Test endpoint
-router.get('/test', (req, res) => {
+app.get('/test', (req, res) => {
   res.status(200).json({ message: 'Test endpoint is working' });
 });
 
@@ -51,9 +54,13 @@ const server = new ApolloServer({
 });
 
 
-// Apply middleware to the router
-const applyMiddleware = async () => {
+// Initialize the server and create the handler
+let handler;
+
+const initializeApp = async () => {
   await server.start();
+  
+  // Apply middleware to the router
   router.use(express.json());
   router.use(
     '/',
@@ -78,10 +85,18 @@ const applyMiddleware = async () => {
 
   // Apply the router to the app at the Netlify Functions path
   app.use('/.netlify/functions/graphql', router);
-  
-  console.log('GraphQL middleware applied');
+
+  // Create the serverless handler
+  handler = serverless(app);
+  console.log('Server initialized');
   return true;
 };
+
+// Initialize the app immediately
+const initialization = initializeApp().catch(err => {
+  console.error('Failed to initialize app:', err);
+  process.exit(1);
+});
 
 // Handle all other routes
 app.all('*', (req, res) => {
@@ -97,28 +112,19 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Initialize and start the server
-const startServer = async () => {
-  try {
-    await applyMiddleware();
-    console.log('Server started successfully');
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
-};
-
 // Export the handler for Netlify Functions
-const handler = serverless(app);
-
 module.exports.handler = async (event, context) => {
-  await applyMiddleware();
+  // Wait for initialization to complete
+  await initialization;
   return handler(event, context);
 };
 
 // For local development
 if (process.env.NODE_ENV !== 'production') {
-  app.listen(process.env.PORT || 3000, () => {
-    console.log(`Server running at http://localhost:${process.env.PORT || 3000}`);
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, async () => {
+    await initialization;
+    console.log(`Server running at http://localhost:${PORT}/.netlify/functions/graphql`);
+    console.log(`Health check: http://localhost:${PORT}/.netlify/functions/graphql/health`);
   });
 }
