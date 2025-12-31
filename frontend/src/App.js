@@ -4,7 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider as FirebaseAuthProvider } from './context/FirebaseAuthContext';
 
 // Theme and Styles
 import theme from './theme/theme';
@@ -41,7 +41,7 @@ import TaxSettings from './pages/Admin/Settings/TaxSettings';
 function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
+      <FirebaseAuthProvider>
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <GlobalStyles />
@@ -134,7 +134,7 @@ function App() {
             </Routes>
           </Layout>
         </ThemeProvider>
-      </AuthProvider>
+      </FirebaseAuthProvider>
     </ErrorBoundary>
   );
 }

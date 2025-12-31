@@ -1,0 +1,30 @@
+[build]
+  # We don't have any static files to publish
+  publish = "public"
+  # Directory containing your function files
+  functions = "netlify/functions"
+  # Command to create a minimal public directory
+  command = "npm run build"
+
+[functions]
+  # Node.js version for Netlify Functions
+  node_bundler = "esbuild"
+  external_node_modules = ["firebase-admin"]
+
+# Redirect all requests to our GraphQL function
+[[redirects]]
+  from = "/graphql"
+  to = "/.netlify/functions/graphql"
+  status = 200
+
+# Health check endpoint
+[[redirects]]
+  from = "/health"
+  to = "/.netlify/functions/graphql/health"
+  status = 200
+
+# Handle all other API requests
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
