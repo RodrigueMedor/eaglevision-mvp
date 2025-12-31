@@ -49,19 +49,19 @@ const server = new ApolloServer({
 });
 
 // Health check endpoint
-app.get('/.netlify/functions/graphql/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Wrap the server setup in an async function
-const setupServer = async () => {
+// Start the Apollo Server
+const startServer = async () => {
   try {
     await server.start();
     console.log('Apollo Server started');
 
     // Apply GraphQL middleware
     app.use(
-        '/.netlify/functions/graphql',
+        '/',
         express.json(),
         expressMiddleware(server, {
           context: async ({ req }) => {
@@ -91,8 +91,8 @@ const setupServer = async () => {
 
     console.log('Middleware applied');
   } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
+    console.error('Failed to start Apollo Server:', error);
+    throw error;
   }
 };
 
@@ -110,16 +110,13 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start the server and export the handler
-const handlerPromise = (async () => {
-  await setupServer();
-  return serverless(app, {
-    binary: ['image/*', 'application/pdf', 'application/octet-stream']
-  });
-})();
+// Start the server
+startServer().catch(error => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
+});
 
 // Export the handler for Netlify Functions
-exports.handler = async (event, context) => {
-  const handler = await handlerPromise;
-  return handler(event, context);
-};
+exports.handler = serverless(app, {
+  binary: ['image/*', 'application/pdf', 'application/octet-stream']
+});
