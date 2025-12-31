@@ -10,16 +10,27 @@ const { initializeFirebase } = require('../../src/firebase');
 const firebase = initializeFirebase();
 const { db, admin, verifyToken } = firebase;
 
-// Create Express app
+// Create Express app and router
 const app = express();
+const router = express.Router();
 
-// Enable CORS
-app.use(cors({
+// Apply middleware to the router
+router.use(cors({
   origin: process.env.FRONTEND_URL || '*',
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Health check endpoint
+router.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Test endpoint
+router.get('/test', (req, res) => {
+  res.status(200).json({ message: 'Test endpoint is working' });
+});
 
 // Create Apollo Server
 const server = new ApolloServer({
@@ -40,49 +51,33 @@ const server = new ApolloServer({
 });
 
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// Test endpoint
-app.get('/test', (req, res) => {
-  res.status(200).json({ message: 'Test endpoint is working' });
-});
-
-// Apply GraphQL middleware
+// Apply middleware to the router
 const applyMiddleware = async () => {
   await server.start();
-  
-  // Apply middleware at the root path
-  app.use(
+  router.use(express.json());
+  router.use(
     '/',
-    express.json(),
     expressMiddleware(server, {
       context: async ({ req }) => {
-        const context = { db, admin };
+        const token = req.headers.authorization?.split(' ')[1];
+        let user = null;
         
-        // Verify token if present
-        const authHeader = req.headers.authorization || '';
-        if (authHeader) {
+        if (token) {
           try {
-            const token = authHeader.replace('Bearer ', '');
-            if (token) {
-              const user = await verifyToken(token);
-              if (user) {
-                context.user = user;
-                context.token = token;
-              }
-            }
+            const decodedToken = await verifyToken(token);
+            user = { uid: decodedToken.uid, email: decodedToken.email };
           } catch (error) {
             console.error('Error verifying token:', error);
           }
         }
         
-        return context;
+        return { user, db, admin };
       },
     })
   );
+
+  // Apply the router to the app at the Netlify Functions path
+  app.use('/.netlify/functions/graphql', router);
   
   console.log('GraphQL middleware applied');
   return true;
@@ -113,10 +108,17 @@ const startServer = async () => {
   }
 };
 
-// Start the server
-startServer();
-
 // Export the handler for Netlify Functions
-exports.handler = serverless(app, {
-  binary: ['image/*', 'application/pdf', 'application/octet-stream']
-});
+const handler = serverless(app);
+
+module.exports.handler = async (event, context) => {
+  await applyMiddleware();
+  return handler(event, context);
+};
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(process.env.PORT || 3000, () => {
+    console.log(`Server running at http://localhost:${process.env.PORT || 3000}`);
+  });
+}

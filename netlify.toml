@@ -18,11 +18,18 @@ status = 200
 from = "/graphql"
 to = "/.netlify/functions/graphql"
 status = 200
+force = true
 
-# Function redirects
+# Health check endpoint
 [[redirects]]
-from = "/.netlify/functions/graphql/*"
-to = "/.netlify/functions/graphql"
+from = "/health"
+to = "/.netlify/functions/graphql/health"
+status = 200
+
+# Test endpoint
+[[redirects]]
+from = "/test"
+to = "/.netlify/functions/graphql/test"
 status = 200
 
 # SPA fallback (must be last)
@@ -35,16 +42,15 @@ status = 200
 node_bundler = "esbuild"
 external_node_modules = ["firebase-admin"]
 
-# Function configuration
 [functions.graphql]
-  node_bundler = "esbuild"
-  external_node_modules = ["firebase-admin"]
+node_bundler = "esbuild"
+external_node_modules = ["firebase-admin"]
 
-# Required for server-side routing
+# Security headers
 [[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "same-origin"
+for = "/*"
+[headers.values]
+X-Frame-Options = "DENY"
+X-XSS-Protection = "1; mode=block"
+X-Content-Type-Options = "nosniff"
+Referrer-Policy = "same-origin"
