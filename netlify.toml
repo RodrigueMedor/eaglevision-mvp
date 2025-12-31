@@ -1,7 +1,7 @@
 [build]
 command = "cd backend && npm install && npm run build"
 publish = "backend/build"
-functions = "backend/netlify/functions"
+functions = "netlify/functions"
 
 [build.environment]
 NODE_VERSION = "16"
