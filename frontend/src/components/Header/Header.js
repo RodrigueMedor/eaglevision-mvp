@@ -73,7 +73,7 @@ const Header = () => {
         <ListItem 
           button 
           component="a" 
-          href="tel:6414514536"
+          href="tel:4074528792"
           sx={{
             color: 'primary.main',
             '&:hover': {
@@ -82,7 +82,7 @@ const Header = () => {
           }}
         >
           <Phone sx={{ mr: 1 }} />
-          <ListItemText primary="(641) 451-4536" />
+          <ListItemText primary="(407) 452-8792" />
         </ListItem>
       </List>
     </Box>
@@ -174,7 +174,7 @@ const Header = () => {
                 <Button
                   variant="contained"
                   color="secondary"
-                  href="tel:6414514536"
+                  href="tel:4074528792"
                   startIcon={<Phone />}
                   sx={{
                     ml: 2,
@@ -190,7 +190,7 @@ const Header = () => {
                     },
                   }}
                 >
-                  (641) 451-4536
+                  (407) 452-8792
                 </Button>
               </Box>
             ) : (

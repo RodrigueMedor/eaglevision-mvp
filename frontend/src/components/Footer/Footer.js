@@ -27,7 +27,7 @@ const Footer = () => {
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mt: 1 }}>
               <MuiLink 
-                href="tel:6414514536" 
+                href="tel:4074528792" 
                 color="inherit" 
                 sx={{ 
                   fontSize: '0.85rem',
@@ -35,7 +35,7 @@ const Footer = () => {
                   '&:hover': { textDecoration: 'underline' } 
                 }}
               >
-                (641) 451-4536
+                (407) 452-8792
               </MuiLink>
               <MuiLink 
                 href="mailto:info@eaglevisionedge.com" 
