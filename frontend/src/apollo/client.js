@@ -4,7 +4,8 @@ import { onError } from '@apollo/client/link/error';
 
 // HTTP connection to the API
 const httpLink = createHttpLink({
-  uri: process.env.REACT_APP_GRAPHQL_URI || 'http://localhost:4000/graphql',
+  uri: 'https://celebrated-daffodil-26463d.netlify.app/.netlify/functions/graphql',
+  credentials: 'include'  // Important for sending cookies with CORS
 });
 
 // Error handling

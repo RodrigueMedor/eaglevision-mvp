@@ -1,21 +1,30 @@
-# example netlify.toml
 [build]
   command = "npm run build"
-  functions = "netlify/functions"
   publish = "build"
+  
+  [build.environment]
+    NODE_VERSION = "16"  # Match your local Node.js version
+    NPM_FLAGS = "--legacy-peer-deps"  # Helps with dependency resolution
 
-  ## Uncomment to use this redirect for Single Page Applications like create-react-app.
-  ## Not needed for static site generators.
-  #[[redirects]]
-  #  from = "/*"
-  #  to = "/index.html"
-  #  status = 200
+# Required for Single Page Applications (SPA)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
-  ## (optional) Settings for Netlify Dev
-  ## https://github.com/netlify/cli/blob/main/docs/netlify-dev.md#project-detection
-  #[dev]
-  #  command = "yarn start" # Command to start your dev server
-  #  port = 3000 # Port that the dev server will be listening on
-  #  publish = "dist" # Folder with the static content for _redirect file
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://celebrated-daffodil-26463d.netlify.app/.netlify/functions/ https://*.google-analytics.com;"
 
-  ## more info on configuring this file: https://ntl.fyi/file-based-build-config
+# Development settings
+[dev]
+  command = "npm start"
+  port = 3000
+  publish = "build"
+  targetPort = 3000
