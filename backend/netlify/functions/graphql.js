@@ -14,7 +14,7 @@ const { db, admin, verifyToken } = firebase;
 const app = express();
 const router = express.Router();
 
-// Apply CORS middleware at the app level to handle preflight requests
+// Apply CORS middleware
 app.use(cors({
   origin: process.env.FRONTEND_URL || '*',
   credentials: true,
@@ -26,14 +26,17 @@ app.use(cors({
 app.options('*', cors());
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+router.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Test endpoint
-app.get('/test', (req, res) => {
+router.get('/test', (req, res) => {
   res.status(200).json({ message: 'Test endpoint is working' });
 });
+
+// Mount the router at the base path
+app.use('/.netlify/functions/graphql', router);
 
 // Create Apollo Server
 const server = new ApolloServer({
@@ -52,7 +55,6 @@ const server = new ApolloServer({
     };
   },
 });
-
 
 // Initialize the server and create the handler
 let handler;
@@ -82,9 +84,6 @@ const initializeApp = async () => {
       },
     })
   );
-
-  // Apply the router to the app at the Netlify Functions path
-  app.use('/.netlify/functions/graphql', router);
 
   // Create the serverless handler
   handler = serverless(app);
