@@ -116,9 +116,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Apply middleware and start the server
-applyMiddleware().catch(error => {
-  console.error('Failed to apply middleware:', error);
+// Initialize and start the server
+initServer().catch(error => {
+  console.error('Failed to initialize server:', error);
   process.exit(1);
 });
 
