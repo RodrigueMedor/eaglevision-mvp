@@ -6,6 +6,9 @@ const cors = require('cors');
 const { typeDefs, resolvers } = require('../../src/schema');
 const { initializeFirebase } = require('../../src/firebase');
 
+// Create Express app
+const app = express();
+
 // Initialize Firebase
 let db, admin, verifyToken;
 try {
@@ -18,9 +21,6 @@ try {
   console.error('Failed to initialize Firebase:', error);
   throw error;
 }
-
-// Create Express app
-const app = express();
 
 // Enable CORS for all routes
 app.use(cors({
@@ -48,59 +48,53 @@ const server = new ApolloServer({
   },
 });
 
-// Start the Apollo Server
-const startServer = async () => {
-  try {
-    await server.start();
-    console.log('Apollo Server started');
-    
-    // Apply middleware
-    app.use(
-      '/.netlify/functions/graphql',
-      express.json(),
-      expressMiddleware(server, {
-        context: async ({ req }) => {
-          const context = { db, admin };
-          
-          // Verify token if present
-          const authHeader = req.headers.authorization || '';
-          if (authHeader) {
-            try {
-              const token = authHeader.replace('Bearer ', '');
-              if (token) {
-                const user = await verifyToken(token);
-                if (user) {
-                  context.user = user;
-                  context.token = token;
-                }
-              }
-            } catch (error) {
-              console.error('Error verifying token:', error);
-            }
-          }
-          
-          return context;
-        },
-      })
-    );
-    
-    console.log('Middleware applied');
-  } catch (error) {
-    console.error('Failed to start Apollo Server:', error);
-    throw error;
-  }
-};
-
-// Initialize the server
-startServer().catch(error => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
-});
-
 // Health check endpoint
 app.get('/.netlify/functions/graphql/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Wrap the server setup in an async function
+const setupServer = async () => {
+  try {
+    await server.start();
+    console.log('Apollo Server started');
+
+    // Apply GraphQL middleware
+    app.use(
+        '/.netlify/functions/graphql',
+        express.json(),
+        expressMiddleware(server, {
+          context: async ({ req }) => {
+            const context = { db, admin };
+
+            // Verify token if present
+            const authHeader = req.headers.authorization || '';
+            if (authHeader) {
+              try {
+                const token = authHeader.replace('Bearer ', '');
+                if (token) {
+                  const user = await verifyToken(token);
+                  if (user) {
+                    context.user = user;
+                    context.token = token;
+                  }
+                }
+              } catch (error) {
+                console.error('Error verifying token:', error);
+              }
+            }
+
+            return context;
+          },
+        })
+    );
+
+    console.log('Middleware applied');
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
 
 // Handle all other routes
 app.all('*', (req, res) => {
@@ -116,35 +110,16 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Start the server and export the handler
+const handlerPromise = (async () => {
+  await setupServer();
+  return serverless(app, {
+    binary: ['image/*', 'application/pdf', 'application/octet-stream']
+  });
+})();
+
 // Export the handler for Netlify Functions
-exports.handler = serverless(app, {
-  binary: ['image/*', 'application/pdf', 'application/octet-stream']
-});
-          const user = await verifyToken(token);
-          if (user) {
-            context.user = user;
-            context.token = token;
-          }
-        }
-        
-        return context;
-      },
-    })
-  );
+exports.handler = async (event, context) => {
+  const handler = await handlerPromise;
+  return handler(event, context);
 };
-
-// Initialize the server
-startServer();
-
-// Create a simple health check endpoint
-app.get('/.netlify/functions/graphql/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
-});
-
-// Handle all other routes
-app.all('*', (req, res) => {
-  res.status(404).json({ error: 'Not Found' });
-});
-
-// Export the handler for Netlify Functions
-exports.handler = serverless(app);
