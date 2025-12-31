@@ -48,9 +48,14 @@ const server = new ApolloServer({
   },
 });
 
-// Health check endpoint (Netlify will prefix with /.netlify/functions/graphql)
-app.get('/.netlify/functions/graphql/health', (req, res) => {
+// Health check endpoint
+app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Test endpoint
+app.get('/test', (req, res) => {
+  res.status(200).json({ message: 'Test endpoint is working' });
 });
 
 // Initialize the server
@@ -61,7 +66,7 @@ const initServer = async () => {
     
     // Apply GraphQL middleware at the root path
     app.use(
-      '/.netlify/functions/graphql',
+      '/',
       express.json(),
       expressMiddleware(server, {
         context: async ({ req }) => {
@@ -88,11 +93,6 @@ const initServer = async () => {
         },
       })
     );
-    
-    // Add a test route
-    app.get('/.netlify/functions/graphql/test', (req, res) => {
-      res.status(200).json({ message: 'Test endpoint is working' });
-    });
     
     console.log('Server initialized successfully');
     return true;
