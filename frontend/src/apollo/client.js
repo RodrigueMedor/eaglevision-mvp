@@ -4,10 +4,14 @@ import { onError } from '@apollo/client/link/error';
 
 // HTTP connection to the API
 const httpLink = createHttpLink({
-  uri: process.env.REACT_APP_GRAPHQL_URI || 'https://eaglevisionedge.com/.netlify/functions/graphql',
+  // Use environment variable or fallback to production URL
+  uri: 'https://eaglevisionedge.com/.netlify/functions/graphql',
   credentials: 'include',  // Important for sending cookies with CORS
   fetchOptions: {
     mode: 'cors',
+  },
+  headers: {
+    'Content-Type': 'application/json',
   },
 });
 
