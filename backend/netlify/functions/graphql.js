@@ -6,23 +6,14 @@ const cors = require('cors');
 const { typeDefs, resolvers } = require('../../src/schema');
 const { initializeFirebase } = require('../../src/firebase');
 
+// Initialize Firebase
+const firebase = initializeFirebase();
+const { db, admin, verifyToken } = firebase;
+
 // Create Express app
 const app = express();
 
-// Initialize Firebase
-let db, admin, verifyToken;
-try {
-  const firebase = initializeFirebase();
-  db = firebase.db;
-  admin = firebase.admin;
-  verifyToken = firebase.verifyToken;
-  console.log('Firebase initialized successfully');
-} catch (error) {
-  console.error('Failed to initialize Firebase:', error);
-  throw error;
-}
-
-// Enable CORS for all routes
+// Enable CORS
 app.use(cors({
   origin: process.env.FRONTEND_URL || '*',
   credentials: true,
@@ -48,6 +39,7 @@ const server = new ApolloServer({
   },
 });
 
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
@@ -58,48 +50,42 @@ app.get('/test', (req, res) => {
   res.status(200).json({ message: 'Test endpoint is working' });
 });
 
-// Initialize the server
-const initServer = async () => {
-  try {
-    await server.start();
-    console.log('Apollo Server started');
-    
-    // Apply GraphQL middleware at the root path
-    app.use(
-      '/',
-      express.json(),
-      expressMiddleware(server, {
-        context: async ({ req }) => {
-          const context = { db, admin };
-          
-          // Verify token if present
-          const authHeader = req.headers.authorization || '';
-          if (authHeader) {
-            try {
-              const token = authHeader.replace('Bearer ', '');
-              if (token) {
-                const user = await verifyToken(token);
-                if (user) {
-                  context.user = user;
-                  context.token = token;
-                }
+// Apply GraphQL middleware
+const applyMiddleware = async () => {
+  await server.start();
+  
+  // Apply middleware at the root path
+  app.use(
+    '/',
+    express.json(),
+    expressMiddleware(server, {
+      context: async ({ req }) => {
+        const context = { db, admin };
+        
+        // Verify token if present
+        const authHeader = req.headers.authorization || '';
+        if (authHeader) {
+          try {
+            const token = authHeader.replace('Bearer ', '');
+            if (token) {
+              const user = await verifyToken(token);
+              if (user) {
+                context.user = user;
+                context.token = token;
               }
-            } catch (error) {
-              console.error('Error verifying token:', error);
             }
+          } catch (error) {
+            console.error('Error verifying token:', error);
           }
-          
-          return context;
-        },
-      })
-    );
-    
-    console.log('Server initialized successfully');
-    return true;
-  } catch (error) {
-    console.error('Failed to initialize server:', error);
-    throw error;
-  }
+        }
+        
+        return context;
+      },
+    })
+  );
+  
+  console.log('GraphQL middleware applied');
+  return true;
 };
 
 // Handle all other routes
@@ -117,10 +103,18 @@ app.use((err, req, res, next) => {
 });
 
 // Initialize and start the server
-initServer().catch(error => {
-  console.error('Failed to initialize server:', error);
-  process.exit(1);
-});
+const startServer = async () => {
+  try {
+    await applyMiddleware();
+    console.log('Server started successfully');
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+// Start the server
+startServer();
 
 // Export the handler for Netlify Functions
 exports.handler = serverless(app, {
