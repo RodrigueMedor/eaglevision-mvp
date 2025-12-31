@@ -1,22 +1,30 @@
 [build]
-  command = "cd backend && npm install && npm run build"
-  publish = "backend/build"
-  functions = "backend/netlify/functions"
+command = "cd backend && npm install && npm run build"
+publish = "backend/build"
+functions = "backend/netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "16"
-  NPM_FLAGS = "--prefix backend"
+NODE_VERSION = "16"
+NPM_FLAGS = "--prefix backend"
 
+# API redirects
 [[redirects]]
-  from = "/graphql"
-  to = "/.netlify/functions/graphql"
-  status = 200
+from = "/api/*"
+to = "/.netlify/functions/:splat"
+status = 200
 
+# GraphQL endpoint
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+from = "/graphql"
+to = "/.netlify/functions/graphql"
+status = 200
+
+# SPA fallback
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
 
 [functions]
-  node_bundler = "esbuild"
-  external_node_modules = ["firebase-admin"]
+node_bundler = "esbuild"
+external_node_modules = ["firebase-admin"]
