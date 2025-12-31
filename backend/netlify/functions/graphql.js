@@ -14,16 +14,33 @@ const { db, admin, verifyToken } = firebase;
 const app = express();
 const router = express.Router();
 
-// Apply CORS middleware
-app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+// Apply CORS middleware with more secure defaults
+const corsOptions = {
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      'https://eaglevisionedge.com',
+      'https://www.eaglevisionedge.com',
+      'http://localhost:3000',
+      'http://localhost:3001'
+    ];
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (process.env.NODE_ENV === 'development' || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn('CORS blocked request from origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
 
-// Handle preflight requests
-app.options('*', cors());
+app.use(cors(corsOptions));
 
 // Health check endpoint
 router.get('/health', (req, res) => {

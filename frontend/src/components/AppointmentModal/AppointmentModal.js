@@ -33,24 +33,48 @@ const services = [
 const AppointmentModal = ({ open, onClose }) => {
   const [createAppointment, { loading: creating }] = useMutation(CREATE_APPOINTMENT, {
     onError: (error) => {
-      console.error('Error creating appointment:', error);
-      // Extract the error message from the GraphQL error
-      const errorMessage = error.graphQLErrors?.[0]?.message || 
-                         error.message || 
-                         'Failed to create appointment. Please try again.';
+      console.error('Error creating appointment:', {
+        message: error.message,
+        graphQLErrors: error.graphQLErrors,
+        networkError: error.networkError,
+        extraInfo: error.extraInfo
+      });
+      
+      // Try to extract a more detailed error message
+      let errorMessage = 'Failed to create appointment. Please try again.';
+      
+      // Check for network errors first
+      if (error.networkError) {
+        errorMessage = 'Network error: Unable to connect to the server. Please check your internet connection.';
+      } 
+      // Check for GraphQL errors
+      else if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+        const gqlError = error.graphQLErrors[0];
+        errorMessage = gqlError.message || 'An error occurred while processing your request.';
+        
+        // Handle specific error codes or types if needed
+        if (gqlError.extensions?.code === 'UNAUTHENTICATED') {
+          errorMessage = 'Please log in to book an appointment.';
+        } else if (gqlError.extensions?.code === 'FORBIDDEN') {
+          errorMessage = 'You do not have permission to perform this action.';
+        }
+      }
       
       setErrors(prev => ({
         ...prev,
         form: errorMessage
       }));
       
-      // Auto-hide the error after 5 seconds
+      // Auto-hide the error after 8 seconds (slightly longer for users to read)
       setTimeout(() => {
         setErrors(prev => ({
           ...prev,
           form: ''
         }));
-      }, 5000);
+      }, 8000);
+    },
+    onCompleted: (data) => {
+      console.log('Appointment created successfully:', data);
     }
   });
   const [updateAppointment, { loading: updating }] = useMutation(UPDATE_APPOINTMENT, {
