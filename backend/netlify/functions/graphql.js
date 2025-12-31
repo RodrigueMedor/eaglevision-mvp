@@ -53,45 +53,46 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Start the Apollo Server
-const startServer = async () => {
+// Apply GraphQL middleware at the root path
+const applyMiddleware = async () => {
   try {
     await server.start();
     console.log('Apollo Server started');
-
-    // Apply GraphQL middleware
+    
+    // Apply GraphQL middleware at the root path
     app.use(
-        '/',
-        express.json(),
-        expressMiddleware(server, {
-          context: async ({ req }) => {
-            const context = { db, admin };
-
-            // Verify token if present
-            const authHeader = req.headers.authorization || '';
-            if (authHeader) {
-              try {
-                const token = authHeader.replace('Bearer ', '');
-                if (token) {
-                  const user = await verifyToken(token);
-                  if (user) {
-                    context.user = user;
-                    context.token = token;
-                  }
+      '/',
+      express.json(),
+      expressMiddleware(server, {
+        context: async ({ req }) => {
+          const context = { db, admin };
+          
+          // Verify token if present
+          const authHeader = req.headers.authorization || '';
+          if (authHeader) {
+            try {
+              const token = authHeader.replace('Bearer ', '');
+              if (token) {
+                const user = await verifyToken(token);
+                if (user) {
+                  context.user = user;
+                  context.token = token;
                 }
-              } catch (error) {
-                console.error('Error verifying token:', error);
               }
+            } catch (error) {
+              console.error('Error verifying token:', error);
             }
-
-            return context;
-          },
-        })
+          }
+          
+          return context;
+        },
+      })
     );
-
-    console.log('Middleware applied');
+    
+    console.log('GraphQL middleware applied');
+    return true;
   } catch (error) {
-    console.error('Failed to start Apollo Server:', error);
+    console.error('Failed to apply middleware:', error);
     throw error;
   }
 };
