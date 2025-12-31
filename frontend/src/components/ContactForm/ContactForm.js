@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react/hooks';
 import { validateEmail, validatePhone } from '../../utils/validators';
 import { CREATE_CONTACT } from '../../graphql/mutations';
 

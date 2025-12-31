@@ -16,7 +16,8 @@ import {
   Alert
 } from '@mui/material';
 import { Send as SendIcon, Clear as ClearIcon } from '@mui/icons-material';
-import { useMutation, gql } from '@apollo/client';
+import { useMutation } from '@apollo/client/react/hooks';
+import { gql } from '@apollo/client';
 
 const MessageForm = () => {
   const theme = useTheme();

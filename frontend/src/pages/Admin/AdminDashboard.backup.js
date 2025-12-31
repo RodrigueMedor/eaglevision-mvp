@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react/hooks';
 import { 
   Tabs, Tab, Box, Typography, Button, Snackbar, Alert, 
   IconButton, useTheme, useMediaQuery, Tooltip, Grid, Paper,

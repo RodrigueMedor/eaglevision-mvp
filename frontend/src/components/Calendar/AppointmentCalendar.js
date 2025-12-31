@@ -29,7 +29,7 @@ import {
   Refresh as RefreshIcon,
   FilterList as FilterListIcon
 } from '@mui/icons-material';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react/hooks';
 import { GET_ALL_APPOINTMENTS } from '../../graphql/admin';
 import AppointmentForm from '../../pages/Admin/AppointmentForm';
 import { format } from 'date-fns';

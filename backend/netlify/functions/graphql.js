@@ -7,37 +7,119 @@ const { typeDefs, resolvers } = require('../../src/schema');
 const { initializeFirebase } = require('../../src/firebase');
 
 // Initialize Firebase
-const { db, admin, verifyToken } = initializeFirebase();
+let db, admin, verifyToken;
+try {
+  const firebase = initializeFirebase();
+  db = firebase.db;
+  admin = firebase.admin;
+  verifyToken = firebase.verifyToken;
+  console.log('Firebase initialized successfully');
+} catch (error) {
+  console.error('Failed to initialize Firebase:', error);
+  throw error;
+}
 
 // Create Express app
 const app = express();
+
+// Enable CORS for all routes
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Create Apollo Server
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  introspection: true, // Enable introspection in production
+  introspection: true,
+  formatError: (error) => {
+    console.error('GraphQL Error:', error);
+    return {
+      message: error.message,
+      locations: error.locations,
+      path: error.path,
+      extensions: {
+        code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
+      },
+    };
+  },
 });
 
 // Start the Apollo Server
 const startServer = async () => {
-  await server.start();
-  
-  // Apply middleware
-  app.use(
-    '/.netlify/functions/graphql',
-    cors({
-      origin: process.env.FRONTEND_URL || '*',
-      credentials: true,
-    }),
-    express.json(),
-    expressMiddleware(server, {
-      context: async ({ req }) => {
-        const context = { db, admin };
-        
-        // Only verify token if present
-        const token = req.headers.authorization || '';
-        if (token) {
+  try {
+    await server.start();
+    console.log('Apollo Server started');
+    
+    // Apply middleware
+    app.use(
+      '/.netlify/functions/graphql',
+      express.json(),
+      expressMiddleware(server, {
+        context: async ({ req }) => {
+          const context = { db, admin };
+          
+          // Verify token if present
+          const authHeader = req.headers.authorization || '';
+          if (authHeader) {
+            try {
+              const token = authHeader.replace('Bearer ', '');
+              if (token) {
+                const user = await verifyToken(token);
+                if (user) {
+                  context.user = user;
+                  context.token = token;
+                }
+              }
+            } catch (error) {
+              console.error('Error verifying token:', error);
+            }
+          }
+          
+          return context;
+        },
+      })
+    );
+    
+    console.log('Middleware applied');
+  } catch (error) {
+    console.error('Failed to start Apollo Server:', error);
+    throw error;
+  }
+};
+
+// Initialize the server
+startServer().catch(error => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
+});
+
+// Health check endpoint
+app.get('/.netlify/functions/graphql/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Handle all other routes
+app.all('*', (req, res) => {
+  res.status(404).json({ error: 'Not Found', path: req.path });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : err.message
+  });
+});
+
+// Export the handler for Netlify Functions
+exports.handler = serverless(app, {
+  binary: ['image/*', 'application/pdf', 'application/octet-stream']
+});
           const user = await verifyToken(token);
           if (user) {
             context.user = user;

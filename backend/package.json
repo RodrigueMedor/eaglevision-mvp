@@ -4,14 +4,14 @@
   "description": "Eagle Vision MVP Backend",
   "main": "netlify/functions/graphql.js",
   "scripts": {
-    "start": "netlify dev",
-    "dev": "netlify dev",
-    "build": "mkdir -p public && echo '{}' > public/empty.json",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "build": "npm install && mkdir -p build && echo '{}' > build/empty.json",
     "serve": "netlify dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   },
   "dependencies": {
     "@apollo/server": "^4.12.2",
@@ -27,6 +27,7 @@
     "serverless-http": "^4.0.0"
   },
   "devDependencies": {
+    "netlify-cli": "^15.0.0",
     "nodemon": "^2.0.20"
   }
 }

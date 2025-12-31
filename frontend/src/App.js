@@ -4,7 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { AuthProvider as FirebaseAuthProvider } from './context/FirebaseAuthContext';
+import { AuthProvider } from './context/FirebaseAuthContext';
 
 // Theme and Styles
 import theme from './theme/theme';
@@ -30,7 +30,7 @@ import Appointments from './pages/Admin/Appointments/Appointments';
 import AppointmentCalendar from './components/Calendar/AppointmentCalendar';
 import Messages from './pages/Admin/Messages/Messages';
 import Reports from './pages/Admin/Reports/Reports';
-import AnalyticsDashboard from './pages/Admin/AnalyticsDashboard'; // Correct path to AnalyticsDashboard
+import AnalyticsDashboard from './pages/Admin/AnalyticsDashboard';
 import Login from './pages/Admin/Login';
 import Profile from './pages/Admin/Profile/Profile';
 
@@ -40,102 +40,104 @@ import TaxSettings from './pages/Admin/Settings/TaxSettings';
 
 function App() {
   return (
-    <ErrorBoundary>
-      <FirebaseAuthProvider>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <GlobalStyles />
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-              
-              {/* Public Routes */}
-              <Route path="/login" element={
-                <AuthWrapper>
-                  <Login />
-                </AuthWrapper>
-              } />
-              
-              {/* Protected Admin Routes */}
-              <Route path="/admin" element={
-                <ProtectedRoute>
-                  <Navigate to="/admin/dashboard" replace />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/dashboard" element={
-                <ProtectedRoute>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/appointments" element={
-                <ProtectedRoute>
-                  <Appointments />
-                </ProtectedRoute>
-              }>
-                <Route index element={<Appointments />} />
-                <Route path="new" element={<Appointments />} />
-              </Route>
-              } />
-              <Route path="/admin/calendar" element={
-                <ProtectedRoute>
-                  <AdminLayout>
-                    <AppointmentCalendar />
-                  </AdminLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/messages/*" element={
-                <ProtectedRoute>
-                  <AdminLayout>
-                    <Messages />
-                  </AdminLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/analytics" element={
-                <ProtectedRoute>
-                  <AdminLayout>
-                    <AnalyticsDashboard />
-                  </AdminLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/reports" element={
-                <ProtectedRoute>
-                  <AdminLayout>
-                    <Reports />
-                  </AdminLayout>
-                </ProtectedRoute>
-              } />
-              <Route path="/admin/settings" element={
-                <ProtectedRoute>
-                  <AdminLayout>
-                    <Outlet />
-                  </AdminLayout>
-                </ProtectedRoute>
-              }>
-                <Route index element={<Settings />} />
-                <Route path="tax" element={<TaxSettings />} />
-              </Route>
-              
-              <Route path="/admin/profile" element={
-                <ProtectedRoute>
-                  <AdminLayout>
-                    <Profile />
-                  </AdminLayout>
-                </ProtectedRoute>
-              } />
-              
-              {/* Redirect to home for unknown routes */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Layout>
-        </ThemeProvider>
-      </FirebaseAuthProvider>
-    </ErrorBoundary>
+      <ErrorBoundary>
+        <AuthProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <GlobalStyles />
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/terms" element={<Terms />} />
+
+                  {/* Public Routes */}
+                  <Route path="/login" element={
+                    <AuthWrapper>
+                      <Login />
+                    </AuthWrapper>
+                  } />
+
+                  {/* Protected Admin Routes */}
+                  <Route path="/admin" element={
+                    <ProtectedRoute>
+                      <Navigate to="/admin/dashboard" replace />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/dashboard" element={
+                    <ProtectedRoute>
+                      <AdminLayout>
+                        <AdminDashboard />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/appointments" element={
+                    <ProtectedRoute>
+                      <AdminLayout>
+                        <Appointments />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/calendar" element={
+                    <ProtectedRoute>
+                      <AdminLayout>
+                        <AppointmentCalendar />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/messages/*" element={
+                    <ProtectedRoute>
+                      <AdminLayout>
+                        <Messages />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/analytics" element={
+                    <ProtectedRoute>
+                      <AdminLayout>
+                        <AnalyticsDashboard />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/reports" element={
+                    <ProtectedRoute>
+                      <AdminLayout>
+                        <Reports />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/settings" element={
+                    <ProtectedRoute>
+                      <AdminLayout>
+                        <Settings />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  }>
+                    <Route index element={<Settings />} />
+                    <Route path="tax" element={<TaxSettings />} />
+                  </Route>
+
+                  <Route path="/admin/profile" element={
+                    <ProtectedRoute>
+                      <AdminLayout>
+                        <Profile />
+                      </AdminLayout>
+                    </ProtectedRoute>
+                  } />
+
+                  {/* Redirect to home for unknown routes */}
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </Layout>
+            </LocalizationProvider>
+          </ThemeProvider>
+        </AuthProvider>
+      </ErrorBoundary>
   );
 }
 

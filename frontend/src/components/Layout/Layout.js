@@ -1,12 +1,13 @@
 import React, { useContext } from 'react';
 import { Box } from '@mui/material';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/FirebaseAuthContext';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
 
 const Layout = ({ children }) => {
-  const { isAuthenticated, user } = useAuth();
+  const { currentUser: user } = useAuth();
+  const isAuthenticated = !!user;
   const location = useLocation();
   
   // Check if the current route is an admin route or if user is an admin

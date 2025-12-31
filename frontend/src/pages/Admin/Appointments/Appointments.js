@@ -39,7 +39,7 @@ import {
   LastPage as LastPageIcon
 } from '@mui/icons-material';
 import { Add as AddIcon, Close as CloseIcon } from '@mui/icons-material';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client/react/hooks';
 import { 
   GET_ALL_APPOINTMENTS, 
   UPDATE_APPOINTMENT, 

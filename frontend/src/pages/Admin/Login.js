@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/FirebaseAuthContext';
 import { 
   Box, 
   TextField, 
@@ -22,7 +22,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { login, error: authError, setError: setAuthError } = useAuth();
+  const { login, signInWithGoogle, error: authError, setError: setAuthError } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || '/admin/dashboard';
@@ -39,15 +39,23 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      const userData = await login(email, password);
-      // Only navigate if login was successful
-      if (userData) {
-        navigate(from, { replace: true });
-      }
-    } catch (err) {
-      console.error('Login error:', err);
-      // Keep the form on the login page
+      await login(email, password);
+      navigate(from, { replace: true });
+    } catch (error) {
+      setAuthError(error.message);
       setPassword(''); // Clear password field for security
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsLoading(true);
+      await signInWithGoogle();
+      navigate(from, { replace: true });
+    } catch (error) {
+      setAuthError(error.message);
     } finally {
       setIsLoading(false);
     }

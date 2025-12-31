@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client/react/hooks';
 import { GET_USER_APPOINTMENTS } from '../../graphql/mutations';
 import {
   Table,

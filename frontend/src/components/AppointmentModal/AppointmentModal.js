@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react/hooks';
 import { CREATE_APPOINTMENT, UPDATE_APPOINTMENT } from '../../graphql/mutations';
 import {
   Dialog,

@@ -40,7 +40,7 @@ import {
   Refresh as RefreshIcon
 } from '@mui/icons-material';
 import debounce from 'lodash/debounce';
-import { useQuery, useMutation, gql } from '@apollo/client';
+import { useQuery, useMutation, gql } from '@apollo/client/react/hooks';
 import MessageForm from './MessageForm';
 import { format } from 'date-fns';
 
