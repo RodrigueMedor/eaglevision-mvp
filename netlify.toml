@@ -1,11 +1,18 @@
 [build]
-command = "cd backend && npm install && npm run build"
-publish = "backend/build"
-functions = "backend/netlify/functions"
+command = "npm run build"
+publish = "frontend/build"
+functions = "netlify/functions"
 
 [build.environment]
-NODE_VERSION = "16"
-NPM_FLAGS = "--prefix backend"
+NODE_VERSION = "18"
+NPM_FLAGS = "--legacy-peer-deps"
+NPM_FLAGS = "--force"
+
+[dev]
+command = "npm start"
+port = 3000
+targetPort = 3000
+publish = "frontend/build"
 
 # API redirects
 [[redirects]]
@@ -40,11 +47,11 @@ status = 200
 
 [functions]
 node_bundler = "esbuild"
-external_node_modules = ["firebase-admin"]
+external_node_modules = ["firebase-admin", "@apollo/server", "express", "cors", "serverless-http"]
 
 [functions.graphql]
 node_bundler = "esbuild"
-external_node_modules = ["firebase-admin"]
+external_node_modules = ["firebase-admin", "@apollo/server", "express", "cors", "serverless-http"]
 
 # Security headers
 [[headers]]
@@ -54,3 +61,4 @@ X-Frame-Options = "DENY"
 X-XSS-Protection = "1; mode=block"
 X-Content-Type-Options = "nosniff"
 Referrer-Policy = "same-origin"
+Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://celebrated-daffodil-26463d.netlify.app/.netlify/functions/ https://*.google-analytics.com;"
