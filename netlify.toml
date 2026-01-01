@@ -26,24 +26,20 @@ to = "/.netlify/functions/graphql"
 status = 200
 force = true
 
-# Redirect all to www and ensure HTTPS
+# Redirect all traffic to www and HTTPS
 [[redirects]]
-  from = "http://eaglevisionedge.com/*"
-  to = "https://www.eaglevisionedge.com/:splat"
-  status = 301
-  force = true
+  from = "/*"
+  to = "/:splat"
+  status = 200
+  conditions = {Host = ["eaglevisionedge.com"]}
+  force = false
 
 [[redirects]]
-  from = "http://www.eaglevisionedge.com/*"
+  from = "/*"
   to = "https://www.eaglevisionedge.com/:splat"
   status = 301
-  force = true
-
-[[redirects]]
-  from = "https://eaglevisionedge.com/*"
-  to = "https://www.eaglevisionedge.com/:splat"
-  status = 301
-  force = true
+  conditions = {Host = ["eaglevisionedge.com"]}
+  force = false
 
 # Health check endpoint
 [[redirects]]
