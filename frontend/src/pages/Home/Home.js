@@ -82,7 +82,7 @@ const features = [
   },
   { 
     text: 'Bilingual Team', 
-    description: 'Fluent in English and Spanish to serve our diverse community.',
+    description: 'Fluent in English and French to serve our diverse community.',
     icon: <TranslateIcon color="primary" /> 
   },
   { 

@@ -20,7 +20,7 @@ const team = [
 
 const features = [
   'Over 20 years of combined experience',
-  'Bilingual support (English, Spanish, French)',
+  'Bilingual support (English, French)',
   'Personalized service for each client',
   'Up-to-date with latest tax laws and regulations',
   'Strong track record of successful cases',
