@@ -43,36 +43,36 @@ import {
 // Service data with detailed descriptions and icons
 const services = [
   {
-    title: 'Tax Preparation',
-    description: 'Professional tax filing for individuals and businesses with maximum refunds guaranteed. We handle all forms including 1040, 1120, 1065, and more.',
+    title: 'Individual & Business Tax Preparation',
+    description: 'Expert tax preparation services for both individuals and businesses. We maximize your refunds and ensure compliance with all tax regulations.',
     icon: <ReceiptIcon fontSize="large" color="primary" />,
-    features: ['Personal & Business Taxes', 'Tax Planning', 'IRS Problem Resolution', 'Year-Round Support']
+    features: ['Personal Tax Returns', 'Business Tax Returns', 'Tax Planning', 'IRS Representation']
   },
   {
-    title: 'Immigration Services',
-    description: 'Comprehensive assistance with all immigration forms and documentation, including green cards, citizenship, work visas, and family petitions.',
+    title: 'ITIN Application Assistance',
+    description: 'Professional help with Individual Taxpayer Identification Number applications and renewals for non-residents and foreign nationals.',
     icon: <AssignmentIcon fontSize="large" color="primary" />,
-    features: ['Green Cards', 'Citizenship', 'Work Visas', 'Family Petitions']
+    features: ['New ITIN Applications', 'ITIN Renewals', 'Document Certification', 'Fast Processing']
   },
   {
-    title: 'Business Services',
-    description: 'Complete business formation, registration, and compliance services to help your business thrive in today\'s competitive market.',
-    icon: <BusinessIcon fontSize="large" color="primary" />,
-    features: ['LLC Formation', 'EIN Registration', 'Annual Reports', 'Business Licensing']
+    title: 'Immigration Forms & Documentation',
+    description: 'Comprehensive assistance with all USCIS forms and documentation for various immigration processes.',
+    icon: <AssignmentIcon fontSize="large" color="primary" />,
+    features: ['Green Card Applications', 'Citizenship (N-400)', 'Work Permits', 'Family Petitions']
   },
   {
-    title: 'Notary Services',
-    description: 'Certified notary services for all your document needs, available with flexible scheduling options.',
-    icon: <VerifiedUserIcon fontSize="large" color="primary" />,
-    features: ['Document Notarization', 'Mobile Service Available', 'Evening/Weekend Appts', 'Bilingual Support']
+    title: 'Translation & Notary Services',
+    description: 'Certified document translation and notary services with flexible scheduling and bilingual support.',
+    icon: <TranslateIcon fontSize="large" color="primary" />,
+    features: ['Document Translation', 'Certified Notary', 'Bilingual Support', 'Mobile Service Available']
   }
 ];
 
 // Why Choose Us features with unique icons
 const features = [
   { 
-    text: 'Licensed & Certified', 
-    description: 'Our team consists of licensed tax professionals and accredited representatives.',
+    text: 'HR Block Certified', 
+    description: 'Certified tax preparer with professional training from HR Block.',
     icon: <VerifiedUserIcon color="primary" /> 
   },
   { 
@@ -176,7 +176,7 @@ const Home = () => {
           <Grid container spacing={4} alignItems="center">
             <Grid item xs={12} lg={7}>
               <Chip 
-                label="Trusted Since 2010" 
+                label="Trusted Since 2025" 
                 color="secondary" 
                 size="small" 
                 sx={{ 

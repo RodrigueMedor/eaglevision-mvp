@@ -8,13 +8,17 @@ const team = [
     name: 'Rodrigue Medor',
     role: 'Founder & Tax Professional',
     bio: 'With a passion for helping individuals and small businesses navigate the complexities of tax preparation and business registration, Rod brings a personal touch to every client interaction.',
-    image: '/images/rodrigue-medor.jpg' // You may want to add your photo here
+    image: '/images/ai-rodrigue-medor.jpg', // AI-generated professional photo
+    linkedin: 'https://www.linkedin.com/in/rodriguemedor',
+    email: 'rod@eaglevisionedge.com'
   },
   {
-    name: 'Our Network',
-    role: 'Trusted Partners',
-    bio: 'We work with a select group of trusted professionals including CPAs, immigration attorneys, and business consultants to provide comprehensive support for all your needs.',
-    image: '/images/team-network.jpg' // Generic team/network image
+    name: 'Our Professional Network',
+    role: 'Trusted Partners & Specialists',
+    bio: 'We collaborate with a curated network of certified professionals including CPAs, immigration attorneys, and business consultants to deliver comprehensive solutions. Our partners are carefully selected for their expertise and commitment to excellence, ensuring you receive the highest quality service across all your financial and legal needs.',
+    image: '/images/ai-professional-network.jpg', // Professional network image
+    linkedin: 'https://www.linkedin.com/company/eagle-vision-edge',
+    email: 'partners@eaglevisionedge.com'
   }
 ];
 
@@ -87,7 +91,7 @@ const About = () => {
           <Grid container spacing={4} alignItems="center">
             <Grid item xs={12} md={6}>
               <Typography variant="body1" paragraph>
-                Founded in 2010, Eagle Vision Edge LLC has been providing exceptional tax and immigration services to individuals and businesses in the community. What started as a small practice has grown into a trusted name, thanks to our commitment to excellence and personalized service.
+                Founded in 2025, Eagle Vision Edge LLC has been providing exceptional tax and immigration services to individuals and businesses in the community. What started as a small practice has grown into a trusted name, thanks to our commitment to excellence and personalized service.
               </Typography>
               <Typography variant="body1" paragraph>
                 Our team of experienced professionals brings together expertise in tax preparation, business registration, and immigration services, offering comprehensive solutions under one roof. We understand the challenges our clients face and are dedicated to making complex processes simple and stress-free.
@@ -196,6 +200,10 @@ const About = () => {
                       border: '5px solid',
                       borderColor: 'primary.main',
                       transition: 'transform 0.3s',
+                      boxShadow: 3,
+                      '&:hover': {
+                        transform: 'scale(1.05)',
+                      },
                     }}
                   >
                     <img 
@@ -204,19 +212,65 @@ const About = () => {
                       style={{ 
                         width: '100%', 
                         height: '100%', 
-                        objectFit: 'cover' 
+                        objectFit: 'cover',
+                        transition: 'transform 0.5s',
+                        '&:hover': {
+                          transform: 'scale(1.1)',
+                        },
                       }} 
                     />
                   </Box>
-                  <Typography variant="h5" component="h3" gutterBottom sx={{ fontWeight: 600 }}>
+                  <Typography variant="h5" component="h3" gutterBottom sx={{ fontWeight: 700, color: 'primary.dark' }}>
                     {member.name}
                   </Typography>
-                  <Typography variant="subtitle1" color="primary" gutterBottom sx={{ fontWeight: 500, mb: 2 }}>
+                  <Typography variant="subtitle1" color="primary" gutterBottom sx={{ 
+                    fontWeight: 600, 
+                    mb: 2,
+                    fontSize: '1.1rem'
+                  }}>
                     {member.role}
                   </Typography>
-                  <Typography variant="body1" color="text.secondary">
+                  <Typography variant="body1" color="text.secondary" sx={{ mb: 2, minHeight: '72px' }}>
                     {member.bio}
                   </Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
+                    {member.linkedin && (
+                      <Link 
+                        href={member.linkedin} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        sx={{ 
+                          color: 'primary.main',
+                          '&:hover': {
+                            color: 'primary.dark',
+                            transform: 'scale(1.1)'
+                          },
+                          transition: 'all 0.3s',
+                        }}
+                      >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        </svg>
+                      </Link>
+                    )}
+                    {member.email && (
+                      <Link 
+                        href={`mailto:${member.email}`}
+                        sx={{ 
+                          color: 'primary.main',
+                          '&:hover': {
+                            color: 'primary.dark',
+                            transform: 'scale(1.1)'
+                          },
+                          transition: 'all 0.3s',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
+                      >
+                        <Email sx={{ fontSize: '1.5rem' }} />
+                      </Link>
+                    )}
+                  </Box>
                 </Box>
               </Grid>
             ))}

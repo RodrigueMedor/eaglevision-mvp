@@ -1,47 +1,81 @@
 import React from 'react';
-import { Box, Container, Grid, Typography, Paper, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import GavelIcon from '@mui/icons-material/Gavel';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import ContactSupportIcon from '@mui/icons-material/ContactSupport';
-import Button from '@mui/material/Button';
+import { 
+  Box, 
+  Container, 
+  Grid, 
+  Typography, 
+  Paper, 
+  Button, 
+  useTheme,
+  useMediaQuery,
+  Card,
+  CardContent,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Chip
+} from '@mui/material';
+import { 
+  Receipt as ReceiptIcon,
+  Assignment as AssignmentIcon,
+  Translate as TranslateIcon,
+  CheckCircle as CheckCircleIcon
+} from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 
 const services = [
   {
+    title: 'Individual & Business Tax Preparation',
+    icon: <ReceiptIcon color="primary" sx={{ fontSize: 50 }} />,
+    description: 'Expert tax preparation services for both individuals and businesses. We maximize your refunds and ensure compliance with all tax regulations.',
+    features: [
+      'Personal Tax Returns',
+      'Business Tax Returns',
+      'Tax Planning',
+      'IRS Representation',
+      'Tax Resolution Services'
+    ]
+  },
+  {
+    title: 'ITIN Application Assistance',
     icon: <AssignmentIcon color="primary" sx={{ fontSize: 50 }} />,
-    title: 'Tax Filing & Business Registration',
-    description: 'Professional tax preparation services for individuals and businesses, ensuring accuracy and maximizing your returns.',
+    description: 'Professional help with Individual Taxpayer Identification Number applications and renewals for non-residents and foreign nationals.',
     features: [
-      'Individual and business tax preparation',
-      'Tax planning and consulting',
-      'Business registration and EIN acquisition',
-      'Quarterly tax estimates and filings',
-      'Tax resolution services'
+      'New ITIN Applications',
+      'ITIN Renewals',
+      'Document Certification',
+      'Fast Processing',
+      'Expert Guidance'
     ]
   },
   {
-    icon: <GavelIcon color="primary" sx={{ fontSize: 50 }} />,
-    title: 'Immigration Form Assistance',
-    description: 'Expert guidance through the complex immigration process with careful attention to detail and accuracy.',
+    title: 'Immigration Services',
+    icon: <AssignmentIcon color="primary" sx={{ fontSize: 50 }} />,
+    description: 'Comprehensive USCIS form preparation and filing assistance for all your immigration needs.',
     features: [
-      'Family-based petitions (I-130, I-485, etc.)',
-      'Work visas and employment authorization',
-      'Naturalization and citizenship applications',
-      'DACA renewals',
-      'Permanent resident card renewals'
+      'Family-Based Immigration (I-130, I-485, I-751, I-864)',
+      'Citizenship & Naturalization (N-400, N-600)',
+      'Green Card Renewal/Replacement (I-90)',
+      'Work Authorization (I-765)',
+      'Travel Documents (I-131)',
+      'DACA Renewals',
+      'Visa Petitions (I-129F, I-140)',
+      'Removal of Conditions (I-751)',
+      'Waivers (I-601, I-601A, I-212)',
+      'U.S. Passport Applications'
     ]
   },
   {
-    icon: <ContactSupportIcon color="primary" sx={{ fontSize: 50 }} />,
-    title: 'Document & Application Support',
-    description: 'Comprehensive assistance with various legal documents and applications.',
+    title: 'Translation & Notary Services',
+    icon: <TranslateIcon color="primary" sx={{ fontSize: 50 }} />,
+    description: 'Certified document translation and notary services with flexible scheduling and bilingual support.',
     features: [
-      'Document translation and notarization',
-      'Application review and preparation',
-      'Case status updates and follow-up',
-      'Document organization and management',
-      'Consultation for complex cases'
+      'Document Translation',
+      'Certified Notary',
+      'Bilingual Support',
+      'Mobile Service Available',
+      'Legal Document Support'
     ]
   }
 ];
