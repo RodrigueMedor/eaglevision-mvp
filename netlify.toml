@@ -9,15 +9,21 @@
   NODE_ENV = "production"
   
   # Only keep the most critical environment variables
-  SESSION_SECRET = "${SESSION_SECRET}"
-  JWT_SECRET = "${JWT_SECRET}"
+  # All other configuration should be in backend/config/config.js
+  NODE_ENV = "production"
   
-  # Remove all other environment variables and move them to:
-  # 1. Frontend: Use Netlify's build environment variables
-  # 2. Backend: Use config files (already set up in backend/config/config.js)
+  # Frontend environment variables (prefixed with REACT_APP_ will be available in the frontend)
+  REACT_APP_NODE_ENV = "production"
   
-  # Note: All Firebase client config should be in frontend/.env.production
-  # DocuSign variables should be in backend/config/config.js
+  # Backend environment variables
+  NODE_ENV = "production"
+  
+  # These are the ONLY environment variables that should be in Netlify's UI:
+  # 1. SESSION_SECRET
+  # 2. JWT_SECRET
+  # 3. DOCUSIGN_WEBHOOK_SECRET (if using DocuSign webhooks)
+  #
+  # All other configuration should be in backend/config/config.js
 
 # Functions configuration
 [functions]
