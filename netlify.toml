@@ -3,25 +3,20 @@
   publish = "frontend/build"
   functions = "netlify/functions"
 
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
-
 [build.environment]
   NODE_VERSION = "18"
   NPM_FLAGS = "--legacy-peer-deps --force"
-  
-  # DocuSign Environment Variables
-  DOCUSIGN_ACCOUNT_ID = "${env:DOCUSIGN_ACCOUNT_ID}"
-  DOCUSIGN_INTEGRATION_KEY = "${env:DOCUSIGN_INTEGRATION_KEY}"
-  DOCUSIGN_USER_ID = "${env:DOCUSIGN_USER_ID}"
-  DOCUSIGN_BASE_PATH = "${env:DOCUSIGN_BASE_PATH}"
-  DOCUSIGN_PRIVATE_KEY = "${env:DOCUSIGN_PRIVATE_KEY}"
-  DOCUSIGN_RETURN_URL = "https://eaglevisionedge.com/appointments"
+  NODE_ENV = "production"
 
+# Functions configuration
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["firebase-admin", "graphql-scalars", "lodash"]
   included_files = ["../backend/config/firebase/**"]
+
+# Netlify Functions Install Core plugin
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
 
 [dev]
   command = "cd frontend && npm start"
