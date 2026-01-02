@@ -6,6 +6,14 @@
 [build.environment]
   NODE_VERSION = "18"
   NPM_FLAGS = "--legacy-peer-deps --force"
+  
+  # DocuSign Environment Variables
+  DOCUSIGN_ACCOUNT_ID = "${env:DOCUSIGN_ACCOUNT_ID}"
+  DOCUSIGN_INTEGRATION_KEY = "${env:DOCUSIGN_INTEGRATION_KEY}"
+  DOCUSIGN_USER_ID = "${env:DOCUSIGN_USER_ID}"
+  DOCUSIGN_BASE_PATH = "${env:DOCUSIGN_BASE_PATH}"
+  DOCUSIGN_PRIVATE_KEY = "${env:DOCUSIGN_PRIVATE_KEY}"
+  DOCUSIGN_RETURN_URL = "https://eaglevisionedge.com/appointments"
 
 [functions]
   node_bundler = "esbuild"
@@ -64,10 +72,18 @@ status = 200
 
 # Security headers
 [[headers]]
-for = "/*"
-[headers.values]
-X-Frame-Options = "DENY"
-X-XSS-Protection = "1; mode=block"
-X-Content-Type-Options = "nosniff"
-Referrer-Policy = "same-origin"
-Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://eaglevisionedge.com/.netlify/functions/ https://*.google-analytics.com;"
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://*.docusign.net;
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: https: https://*.docusign.net;
+      font-src 'self' data: https:;
+      connect-src 'self' https://eaglevisionedge.com/.netlify/functions/ https://*.google-analytics.com https://*.docusign.net https://*.docusign.com;
+      frame-ancestors 'none';
+    """
+    Referrer-Policy = "same-origin"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"

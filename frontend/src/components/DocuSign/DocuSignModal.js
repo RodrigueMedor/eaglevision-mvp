@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://eaglevisionedge.com/.netlify/functions';
 
 export default function DocuSignModal({ open, onClose, onSigningComplete, formData }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -57,7 +57,7 @@ export default function DocuSignModal({ open, onClose, onSigningComplete, formDa
           appointment: appointmentData
         });
 
-        const response = await fetch(`${API_BASE_URL}/api/docusign/envelope`, {
+        const response = await fetch(`${API_BASE_URL}/docusign-envelope`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
