@@ -310,8 +310,23 @@ const appointmentResolvers = {
 
         const docRef = db.collection('appointments').doc(id);
         const doc = await docRef.get();
-  },
-  
+        
+        if (!doc.exists) {
+          throw new UserInputError('Appointment not found');
+        }
+        
+        await docRef.delete();
+        
+        return {
+          id,
+          success: true
+        };
+      } catch (error) {
+        console.error('Error deleting appointment:', error);
+        throw error;
+      }
+    },
+    
   async resendSSO(_, { appointmentId }, { db, user }) {
     if (!user) {
       throw new AuthenticationError('You must be logged in to resend verification');

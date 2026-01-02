@@ -3,7 +3,8 @@ const admin = require('firebase-admin');
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
-  const serviceAccount = require('../backend/config/firebase/service-account.json');
+  // Use environment variables for Firebase config
+  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });
