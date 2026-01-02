@@ -1,17 +1,22 @@
 [build]
-command = "cd frontend && npm install && CI=false npm run build && cd ../backend && npm ci"
-publish = "frontend/build"
-functions = "netlify/functions"
+  command = "cd frontend && npm install && CI=false npm run build && cd ../netlify/functions && npm ci"
+  publish = "frontend/build"
+  functions = "netlify/functions"
 
 [build.environment]
-NODE_VERSION = "18"
-NPM_FLAGS = "--legacy-peer-deps --force"
+  NODE_VERSION = "18"
+  NPM_FLAGS = "--legacy-peer-deps --force"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["firebase-admin"]
+  included_files = ["../backend/config/firebase/**"]
 
 [dev]
-command = "cd frontend && npm start"
-port = 3000
-targetPort = 3000
-publish = "frontend/build"
+  command = "cd frontend && npm start"
+  port = 3000
+  targetPort = 3000
+  publish = "frontend/build"
 
 # API redirects
 [[redirects]]
@@ -56,14 +61,6 @@ status = 200
 from = "/*"
 to = "/index.html"
 status = 200
-
-[functions]
-node_bundler = "esbuild"
-external_node_modules = ["firebase-admin", "@apollo/server", "express", "cors", "serverless-http"]
-
-[functions.graphql]
-node_bundler = "esbuild"
-external_node_modules = ["firebase-admin", "@apollo/server", "express", "cors", "serverless-http"]
 
 # Security headers
 [[headers]]

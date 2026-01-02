@@ -1,0 +1,21 @@
+{
+  "name": "eaglevision-functions",
+  "version": "1.0.0",
+  "description": "Netlify Functions for Eagle Vision",
+  "main": "graphql.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.0.0",
+    "apollo-server-express": "^3.13.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "firebase-admin": "^11.11.0",
+    "graphql": "^16.8.1",
+    "serverless-http": "^3.2.0"
+  },
+  "keywords": ["graphql", "apollo", "netlify", "firebase"],
+  "author": "Eagle Vision",
+  "license": "ISC"
+}
