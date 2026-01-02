@@ -1,4 +1,6 @@
 const admin = require('firebase-admin');
+const fs = require('fs');
+const path = require('path');
 
 let firebaseInitialized = false;
 let dbInstance = null;
@@ -15,24 +17,24 @@ function initializeFirebase() {
   }
 
   try {
-    // Get service account from environment variable
-    const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
-    
-    if (!serviceAccount) {
-      throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable is not set');
-    }
+    // Path to service account file
+    const serviceAccountPath = process.env.NODE_ENV === 'production'
+      ? '/var/task/config/firebase/serviceAccountKey.json'  // Netlify Lambda path
+      : path.join(__dirname, '../../config/firebase/serviceAccountKey.json');
 
-    // Parse the service account JSON
-    const serviceAccountJson = typeof serviceAccount === 'string' 
-      ? JSON.parse(serviceAccount)
-      : serviceAccount;
+    // Read service account file
+    if (!fs.existsSync(serviceAccountPath)) {
+      throw new Error(`Firebase service account file not found at: ${serviceAccountPath}`);
+    }
+    
+    const serviceAccount = require(serviceAccountPath);
     
     // Initialize Firebase Admin if not already initialized
     if (!admin.apps.length) {
       admin.initializeApp({
-        credential: admin.credential.cert(serviceAccountJson),
-        databaseURL: `https://${serviceAccountJson.project_id}.firebaseio.com`,
-        storageBucket: `${serviceAccountJson.project_id}.appspot.com`
+        credential: admin.credential.cert(serviceAccount),
+        databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`,
+        storageBucket: `${serviceAccount.project_id}.appspot.com`
       });
     }
     

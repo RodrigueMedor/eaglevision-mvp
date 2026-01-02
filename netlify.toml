@@ -12,7 +12,7 @@
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["firebase-admin", "graphql-scalars", "lodash"]
-  included_files = ["../backend/config/firebase/**"]
+  included_files = ["backend/config/firebase/serviceAccountKey.json"]
 
 # Netlify Functions Install Core plugin
 [[plugins]]
