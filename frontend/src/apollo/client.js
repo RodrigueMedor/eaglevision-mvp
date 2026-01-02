@@ -3,10 +3,10 @@ import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 
 // HTTP connection to the API
+// Use environment variable or fallback to Netlify function URL
 const httpLink = createHttpLink({
-  // Point directly to your backend server
-  uri: process.env.REACT_APP_GRAPHQL_URI || 'https://api.eaglevisionedge.com/graphql',
-  credentials: 'include',  // Important for sending cookies with CORS
+  uri: process.env.REACT_APP_GRAPHQL_URI || 'https://celebrated-daffodil-26463d.netlify.app/.netlify/functions/graphql',
+  credentials: 'include',
   fetchOptions: {
     mode: 'cors',
   },
