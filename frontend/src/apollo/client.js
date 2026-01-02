@@ -5,7 +5,7 @@ import { onError } from '@apollo/client/link/error';
 // HTTP connection to the API
 // Use environment variable or fallback to Netlify function URL
 const httpLink = createHttpLink({
-  uri: process.env.REACT_APP_GRAPHQL_URI || 'https://celebrated-daffodil-26463d.netlify.app/.netlify/functions/graphql',
+  uri: process.env.REACT_APP_GRAPHQL_URI || 'https://eaglevisionedge.com/.netlify/functions/graphql',
   credentials: 'include',
   fetchOptions: {
     mode: 'cors',
