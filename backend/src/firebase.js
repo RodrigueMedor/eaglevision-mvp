@@ -1,6 +1,7 @@
 const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
+const config = require('../config/config');
 
 let firebaseInitialized = false;
 let dbInstance = null;
@@ -18,7 +19,7 @@ function initializeFirebase() {
 
   try {
     // Path to service account file
-    const serviceAccountPath = process.env.NODE_ENV === 'production'
+    const serviceAccountPath = process.env.NETLIFY
       ? '/var/task/config/firebase/serviceAccountKey.json'  // Netlify Lambda path
       : path.join(__dirname, '../../config/firebase/serviceAccountKey.json');
 
@@ -37,7 +38,7 @@ function initializeFirebase() {
         storageBucket: `${serviceAccount.project_id}.appspot.com`
       });
     }
-    
+
     // Initialize Firestore
     const db = admin.firestore();
     db.settings({ ignoreUndefinedProperties: true });
@@ -46,6 +47,8 @@ function initializeFirebase() {
     dbInstance = db;
     adminInstance = admin;
     firebaseInitialized = true;
+
+    console.log('Firebase Admin initialized successfully');
     
     console.log('Firebase Admin SDK and Firestore initialized successfully');
     

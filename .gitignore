@@ -86,3 +86,11 @@ yarn-error.log*
 
 .env           # Ignores the .env file
 .env.*
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Firebase
+backend/config/firebase/serviceAccountKey.json
