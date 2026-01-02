@@ -8,16 +8,16 @@
   NPM_FLAGS = "--legacy-peer-deps --force"
   NODE_ENV = "production"
   
-  # Only keep the most sensitive environment variables
+  # Only keep the most critical environment variables
   SESSION_SECRET = "${SESSION_SECRET}"
   JWT_SECRET = "${JWT_SECRET}"
   
-  # DocuSign variables (only if needed)
-  DOCUSIGN_ACCOUNT_ID = "${DOCUSIGN_ACCOUNT_ID}"
-  DOCUSIGN_AUTH_SERVER = "${DOCUSIGN_AUTH_SERVER}"
-  DOCUSIGN_CLIENT_ID = "${DOCUSIGN_CLIENT_ID}"
-  DOCUSIGN_USER_ID = "${DOCUSIGN_USER_ID}"
-  DOCUSIGN_WEBHOOK_SECRET = "${DOCUSIGN_WEBHOOK_SECRET}"
+  # Remove all other environment variables and move them to:
+  # 1. Frontend: Use Netlify's build environment variables
+  # 2. Backend: Use config files (already set up in backend/config/config.js)
+  
+  # Note: All Firebase client config should be in frontend/.env.production
+  # DocuSign variables should be in backend/config/config.js
 
 # Functions configuration
 [functions]

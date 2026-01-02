@@ -38,9 +38,8 @@ yarn-error.log*
 firebase-debug.log
 firebase-debug.*.log
 
-# Firebase Service Account Key
-**/config/firebase/serviceAccountKey.json
-**/serviceAccountKey.json
+# Firebase Service Account Key (not ignored - tracked in version control)
+# serviceAccountKey.json is intentionally tracked in version control
 
 # Backend specific
 /backend/node_modules/
