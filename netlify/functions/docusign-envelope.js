@@ -1,10 +1,23 @@
 const { docusign } = require('docusign-esign');
 const admin = require('firebase-admin');
+const path = require('path');
+const fs = require('fs');
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
-  // Use environment variables for Firebase config
-  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  // Path to service account file
+  const serviceAccountPath = process.env.NETLIFY
+    ? '/var/task/config/firebase/serviceAccountKey.json'  // Netlify Lambda path
+    : path.join(process.cwd(), '..', 'backend', 'config', 'firebase', 'serviceAccountKey.json');
+
+  // Read service account file
+  if (!fs.existsSync(serviceAccountPath)) {
+    console.error(`Firebase service account file not found at: ${serviceAccountPath}`);
+    throw new Error('Firebase service account file not found');
+  }
+  
+  const serviceAccount = require(serviceAccountPath);
+  
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });

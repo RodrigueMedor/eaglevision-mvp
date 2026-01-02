@@ -7,6 +7,17 @@
   NODE_VERSION = "18"
   NPM_FLAGS = "--legacy-peer-deps --force"
   NODE_ENV = "production"
+  
+  # Only keep the most sensitive environment variables
+  SESSION_SECRET = "${SESSION_SECRET}"
+  JWT_SECRET = "${JWT_SECRET}"
+  
+  # DocuSign variables (only if needed)
+  DOCUSIGN_ACCOUNT_ID = "${DOCUSIGN_ACCOUNT_ID}"
+  DOCUSIGN_AUTH_SERVER = "${DOCUSIGN_AUTH_SERVER}"
+  DOCUSIGN_CLIENT_ID = "${DOCUSIGN_CLIENT_ID}"
+  DOCUSIGN_USER_ID = "${DOCUSIGN_USER_ID}"
+  DOCUSIGN_WEBHOOK_SECRET = "${DOCUSIGN_WEBHOOK_SECRET}"
 
 # Functions configuration
 [functions]

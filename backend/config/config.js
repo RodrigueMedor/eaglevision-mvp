@@ -1,6 +1,9 @@
-const dotenv = require('dotenv');
-dotenv.config();
+// Load environment variables from .env file
+require('dotenv').config();
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Default configuration
 const config = {
   // Firebase config (moved to file)
   firebase: {
@@ -15,12 +18,23 @@ const config = {
   // App config
   app: {
     nodeEnv: process.env.NODE_ENV || 'development',
-    apiUrl: process.env.API_URL,
-    frontendUrl: process.env.FRONTEND_URL,
-    cookieDomain: process.env.COOKIE_DOMAIN,
-    secureCookie: process.env.SECURE_COOKIE === 'true',
-    sessionSecret: process.env.SESSION_SECRET,
-    jwtSecret: process.env.JWT_SECRET
+    apiUrl: process.env.API_URL || (isProduction 
+      ? 'https://eaglevisionedge.com/.netlify/functions' 
+      : 'http://localhost:8888/.netlify/functions'
+    ),
+    frontendUrl: process.env.FRONTEND_URL || (
+      isProduction 
+        ? 'https://eaglevisionedge.com' 
+        : 'http://localhost:3000'
+    ),
+    cookieDomain: process.env.COOKIE_DOMAIN || (
+      isProduction ? '.eaglevisionedge.com' : 'localhost'
+    ),
+    secureCookie: process.env.SECURE_COOKIE !== 'false', // true by default
+    // These will use the static values from netlify.toml in production
+    // or the fallback values in development
+    sessionSecret: process.env.SESSION_SECRET || 'dev-session-secret-12345',
+    jwtSecret: process.env.JWT_SECRET || 'dev-jwt-secret-67890'
   },
   // Rate limiting
   rateLimit: {
