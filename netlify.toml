@@ -11,7 +11,7 @@
 # Functions configuration
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["firebase-admin", "graphql-scalars", "lodash"]
+  external_node_modules = ["firebase-admin", "graphql-scalars", "lodash", "dotenv"]
   included_files = [
     "backend/config/firebase/serviceAccountKey.json",
     "backend/config/config.js"
