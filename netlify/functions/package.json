@@ -16,9 +16,15 @@
     "graphql": "^16.8.1",
     "graphql-scalars": "^1.22.0",
     "lodash": "^4.17.21",
+    "nodemailer": "^7.0.12",
     "serverless-http": "^3.2.0"
   },
-  "keywords": ["graphql", "apollo", "netlify", "firebase"],
+  "keywords": [
+    "graphql",
+    "apollo",
+    "netlify",
+    "firebase"
+  ],
   "author": "Eagle Vision",
   "license": "ISC"
 }
