@@ -83,3 +83,6 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+.env           # Ignores the .env file
+.env.*

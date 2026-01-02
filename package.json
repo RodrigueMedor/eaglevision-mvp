@@ -26,5 +26,8 @@
   "bugs": {
     "url": "https://github.com/RodrigueMedor/eaglevision-mvp/issues"
   },
-  "homepage": "https://github.com/RodrigueMedor/eaglevision-mvp#readme"
+  "homepage": "https://github.com/RodrigueMedor/eaglevision-mvp#readme",
+  "devDependencies": {
+    "dotenv": "^17.2.3"
+  }
 }
