@@ -387,7 +387,12 @@ const appointmentResolvers = {
         status: 'ERROR',
         message: 'Failed to resend SSO verification email',
         error: error.message
+      });
+      
+      throw new Error('Failed to resend SSO verification email');
+    }
   },
+  
   Appointment: {
     // Resolve any custom fields or relationships for the Appointment type
     id: (parent) => parent.id || parent._id,
