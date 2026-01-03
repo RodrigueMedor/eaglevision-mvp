@@ -7,32 +7,12 @@
   NODE_VERSION = "18"
   NPM_FLAGS = "--legacy-peer-deps --force"
   NODE_ENV = "production"
-  
-  # Only keep the most critical environment variables
-  # All other configuration should be in backend/config/config.js
-  NODE_ENV = "production"
-  
-  # Frontend environment variables (prefixed with REACT_APP_ will be available in the frontend)
-  REACT_APP_NODE_ENV = "production"
-  
-  # Backend environment variables
-  NODE_ENV = "production"
-  
-  # These are the ONLY environment variables that should be in Netlify's UI:
-  # 1. SESSION_SECRET
-  # 2. JWT_SECRET
-  # 3. DOCUSIGN_WEBHOOK_SECRET (if using DocuSign webhooks)
-  #
-  # All other configuration should be in backend/config/config.js
 
 # Functions configuration
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["firebase-admin", "graphql-scalars", "lodash", "dotenv"]
-  included_files = [
-    "backend/config/firebase/serviceAccountKey.json",
-    "backend/config/config.js"
-  ]
+  external_node_modules = ["firebase-admin", "graphql-scalars", "lodash"]
+  included_files = ["../backend/config/firebase/**"]
 
 # Netlify Functions Install Core plugin
 [[plugins]]

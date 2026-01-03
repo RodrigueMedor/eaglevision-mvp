@@ -1,7 +1,4 @@
 const admin = require('firebase-admin');
-const fs = require('fs');
-const path = require('path');
-const config = require('../config/config');
 
 let firebaseInitialized = false;
 let dbInstance = null;
@@ -18,27 +15,27 @@ function initializeFirebase() {
   }
 
   try {
-    // Path to service account file
-    const serviceAccountPath = process.env.NETLIFY
-      ? '/var/task/config/firebase/serviceAccountKey.json'  // Netlify Lambda path
-      : path.join(__dirname, '../../config/firebase/serviceAccountKey.json');
-
-    // Read service account file
-    if (!fs.existsSync(serviceAccountPath)) {
-      throw new Error(`Firebase service account file not found at: ${serviceAccountPath}`);
-    }
+    // Get service account from environment variable
+    const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
     
-    const serviceAccount = require(serviceAccountPath);
+    if (!serviceAccount) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable is not set');
+    }
+
+    // Parse the service account JSON
+    const serviceAccountJson = typeof serviceAccount === 'string' 
+      ? JSON.parse(serviceAccount)
+      : serviceAccount;
     
     // Initialize Firebase Admin if not already initialized
     if (!admin.apps.length) {
       admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-        databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`,
-        storageBucket: `${serviceAccount.project_id}.appspot.com`
+        credential: admin.credential.cert(serviceAccountJson),
+        databaseURL: `https://${serviceAccountJson.project_id}.firebaseio.com`,
+        storageBucket: `${serviceAccountJson.project_id}.appspot.com`
       });
     }
-
+    
     // Initialize Firestore
     const db = admin.firestore();
     db.settings({ ignoreUndefinedProperties: true });
@@ -47,8 +44,6 @@ function initializeFirebase() {
     dbInstance = db;
     adminInstance = admin;
     firebaseInitialized = true;
-
-    console.log('Firebase Admin initialized successfully');
     
     console.log('Firebase Admin SDK and Firestore initialized successfully');
     
