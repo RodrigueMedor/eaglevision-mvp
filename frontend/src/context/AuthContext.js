@@ -65,19 +65,6 @@ export const AuthProvider = ({ children }) => {
     console.log('Activity updated at:', new Date(now).toISOString());
   }, []);
 
-  // Function to handle successful login
-  const handleLoginSuccess = useCallback(({ access_token, refresh_token, user }) => {
-    if (access_token && refresh_token) {
-      localStorage.setItem('access_token', access_token);
-      localStorage.setItem('refresh_token', refresh_token);
-      updateActivity();
-      setUser(user);
-      setError(null);
-      return true;
-    }
-    return false;
-  }, [updateActivity]);
-
 
   // Function to check authentication status
   const checkAuth = useCallback(async () => {
@@ -164,12 +151,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [API_URL]);
-
-  // Store the logout function in a ref
-  useEffect(() => {
-    logoutRef.current = logout;
-  }, [logout]);
+  }, [API_URL, api, updateActivity]);
 
   // Function to handle user activity
   const resetInactivityTimer = useCallback(() => {
@@ -185,7 +167,7 @@ export const AuthProvider = ({ children }) => {
         logoutRef.current();
       }
     }, getSessionTimeout());
-  }, [getSessionTimeout]);
+  }, [logoutRef, getSessionTimeout]);
 
   // Set up event listeners for user activity
   useEffect(() => {
@@ -327,7 +309,7 @@ export const AuthProvider = ({ children }) => {
         clearTimeout(logoutTimer.current);
       }
     };
-  }, [checkAuth, navigate, resetInactivityTimer, updateActivity]);
+  }, [checkAuth, navigate, resetInactivityTimer, updateActivity, api, logout, user]);
 
   // Handle token refresh on focus
   useEffect(() => {
@@ -353,7 +335,7 @@ export const AuthProvider = ({ children }) => {
 
     window.addEventListener('visibilitychange', handleVisibilityChange);
     return () => window.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [checkAuth, getSessionTimeout]);
+  }, [checkAuth]);
 
   const login = async (email, password, rememberMe = false) => {
     try {
