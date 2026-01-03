@@ -13,6 +13,11 @@ const isRememberMeEnabled = () => {
   return localStorage.getItem('remember_me') === '1';
 };
 
+// Get the appropriate session timeout based on remember me setting
+const getSessionTimeout = () => {
+  return isRememberMeEnabled() ? REMEMBER_ME_SESSION_TIMEOUT : DEFAULT_SESSION_TIMEOUT;
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,11 +27,6 @@ export const AuthProvider = ({ children }) => {
   const logoutTimer = useRef(null);
   const logoutRef = useRef(null);
   
-  // Get session timeout based on remember me setting
-  const getSessionTimeout = useCallback(() => {
-    return isRememberMeEnabled() ? REMEMBER_ME_SESSION_TIMEOUT : DEFAULT_SESSION_TIMEOUT;
-  }, []);
-
   // Initialize axios instance with auth token
   const api = axios.create({
     baseURL: API_URL,
@@ -178,17 +178,14 @@ export const AuthProvider = ({ children }) => {
       clearTimeout(logoutTimer.current);
     }
 
-    // Get the appropriate timeout based on remember me setting
-    const sessionTimeout = isRememberMeEnabled() ? REMEMBER_ME_SESSION_TIMEOUT : DEFAULT_SESSION_TIMEOUT;
-
     // Set new timer
     logoutTimer.current = setTimeout(() => {
       console.log('User inactive, logging out...');
       if (logoutRef.current) {
         logoutRef.current();
       }
-    }, sessionTimeout);
-  }, [isRememberMeEnabled]);
+    }, getSessionTimeout());
+  }, [getSessionTimeout]);
 
   // Set up event listeners for user activity
   useEffect(() => {
