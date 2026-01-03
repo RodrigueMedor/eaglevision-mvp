@@ -1,13 +1,20 @@
 const { docusign } = require('docusign-esign');
 const admin = require('firebase-admin');
+const SecureConfig = require('../../backend/src/config/secureConfig');
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
-  // Use environment variables for Firebase config
-  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-  });
+  (async () => {
+    try {
+      const serviceAccount = await SecureConfig.getFirebaseConfig();
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+      });
+    } catch (error) {
+      console.error('Failed to initialize Firebase Admin:', error);
+      throw error;
+    }
+  })();
 }
 
 const db = admin.firestore();

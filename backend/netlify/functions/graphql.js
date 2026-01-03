@@ -14,20 +14,33 @@ const { db, admin, verifyToken } = firebase;
 const app = express();
 const router = express.Router();
 
-// Apply CORS middleware with more secure defaults
+// Configure CORS options
 const corsOptions = {
   origin: (origin, callback) => {
     const allowedOrigins = [
       'https://eaglevisionedge.com',
       'https://www.eaglevisionedge.com',
       'http://localhost:3000',
-      'http://localhost:3001'
+      'http://localhost:3001',
+      /^\.netlify\.app$/, // Allow all Netlify preview deployments
+      /^https?:\/\/[^.]+\.netlify\.app$/, // Allow all Netlify preview deployments
+      'https://celebrated-daffodil-26463d.netlify.app' // Specific Netlify deployment
     ];
     
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    if (process.env.NODE_ENV === 'development' || allowedOrigins.includes(origin)) {
+    // Check if the origin matches any of the allowed patterns
+    const isAllowed = allowedOrigins.some(allowedOrigin => {
+      if (typeof allowedOrigin === 'string') {
+        return origin === allowedOrigin;
+      } else if (allowedOrigin instanceof RegExp) {
+        return allowedOrigin.test(origin);
+      }
+      return false;
+    });
+    
+    if (process.env.NODE_ENV === 'development' || isAllowed) {
       callback(null, true);
     } else {
       console.warn('CORS blocked request from origin:', origin);
@@ -35,12 +48,28 @@ const corsOptions = {
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Apollo-Require-Preflight'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+  maxAge: 86400 // 24 hours
 };
 
+// Apply CORS middleware to all routes
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // Enable preflight for all routes
+
+// Handle preflight requests
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', req.headers.origin);
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    return res.status(200).end();
+  }
+  next();
+});
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -76,13 +105,46 @@ const server = new ApolloServer({
 // Initialize the server and create the handler
 let handler;
 
+// Create Apollo Server with CORS support
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  formatError: (error) => {
+    console.error('GraphQL Error:', error);
+    return {
+      message: error.message,
+      locations: error.locations,
+      path: error.path,
+      extensions: error.extensions
+    };
+  },
+  plugins: [
+    {
+      async requestDidStart() {
+        return {
+          async willSendResponse({ response }) {
+            // Ensure CORS headers are set on all responses
+            if (response && response.http) {
+              response.http.headers.set('Access-Control-Allow-Origin', response.http.headers.get('origin') || '*');
+              response.http.headers.set('Access-Control-Allow-Credentials', 'true');
+            }
+          },
+        };
+      },
+    },
+  ],
+});
+
 const initializeApp = async () => {
   await server.start();
   
   // Apply middleware to the router
   router.use(express.json());
+  
+  // Apply GraphQL middleware with CORS
   router.use(
     '/',
+    cors(corsOptions),
     expressMiddleware(server, {
       context: async ({ req }) => {
         const token = req.headers.authorization?.split(' ')[1];
@@ -101,10 +163,13 @@ const initializeApp = async () => {
       },
     })
   );
+  
+  // Mount the router to the app
+  app.use(router);
 
   // Create the serverless handler
   handler = serverless(app);
-  console.log('Server initialized');
+  console.log('Server initialized with CORS support');
   return true;
 };
 

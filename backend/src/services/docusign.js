@@ -2,6 +2,7 @@ const docusign = require('docusign-esign');
 const admin = require('firebase-admin');
 const { v4: uuidv4 } = require('uuid');
 const { logAudit } = require('../utils/audit');
+const SecureConfig = require('../config/secureConfig');
 
 /**
  * Generates a JWT token for DocuSign API authentication
@@ -12,11 +13,12 @@ async function getDocusignJwtToken(apiClient) {
   try {
     const jwtLifeSec = 10 * 60; // 10 minutes
     
+    const privateKey = SecureConfig.getDocusignPrivateKey();
     const jwtResponse = await apiClient.requestJWTUserToken(
       process.env.DOCUSIGN_INTEGRATION_KEY,
       process.env.DOCUSIGN_USER_ID,
       ['signature', 'impersonation'],
-      Buffer.from(process.env.DOCUSIGN_PRIVATE_KEY, 'utf8'),
+      privateKey,
       jwtLifeSec
     );
     
