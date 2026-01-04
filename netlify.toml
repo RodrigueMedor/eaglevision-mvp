@@ -1,7 +1,6 @@
 [build]
-  command = "npm install && cd backend && npm install && cd .. && npm run build"
+  command = "npm install && cd frontend && npm install && npm run build"
   publish = "frontend/build"
-  functions = "netlify/functions"
 
 [dev]
   # Run the React app on port 3000
@@ -20,12 +19,7 @@
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["firebase-admin", "graphql-scalars", "lodash", "graphql-type-json"]
-  # Include node_modules for all dependencies
   included_files = ["node_modules/graphql-type-json/**"]
-
-# Netlify Functions Install Core plugin
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
 
 # Environment variables for build
 [context.production.environment]
