@@ -26,8 +26,6 @@
 # Netlify Functions Install Core plugin
 [[plugins]]
   package = "@netlify/plugin-functions-install-core"
-  [plugins.inputs]
-    functions = "netlify/functions"
 
 # Environment variables for build
 [context.production.environment]
