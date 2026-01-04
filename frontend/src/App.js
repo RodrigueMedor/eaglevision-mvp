@@ -1,5 +1,11 @@
 import React from 'react';
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { 
+  Routes, 
+  Route, 
+  Navigate, 
+  Outlet 
+} from 'react-router-dom';
+import { Box } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -37,6 +43,7 @@ import Profile from './pages/Admin/Profile/Profile';
 // Settings
 import Settings from './pages/Admin/Settings/Settings';
 import TaxSettings from './pages/Admin/Settings/TaxSettings';
+import BookAppointmentForm from './components/AppointmentModal/BookAppointmentForm';
 
 function App() {
   return (
@@ -55,6 +62,13 @@ function App() {
                   <Route path="/faq" element={<FAQ />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/terms" element={<Terms />} />
+                  
+                  {/* New Appointment Form */}
+                  <Route path="/appointment" element={
+                    <Box sx={{ py: 8 }}>
+                      <BookAppointmentForm />
+                    </Box>
+                  } />
 
                   {/* Public Routes */}
                   <Route path="/login" element={

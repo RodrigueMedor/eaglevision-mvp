@@ -86,7 +86,7 @@ const Privacy = () => {
           <Typography component="div" sx={{ pl: 2 }}>
             <ul>
               <li>By email: privacy@eaglevisionedge.com</li>
-              <li>By phone: (641) 451-4536</li>
+              <li>By phone: (407) 452-8792</li>
               <li>By mail: 123 Business Ave, Suite 100, Anytown, IA 50001</li>
             </ul>
           </Typography>

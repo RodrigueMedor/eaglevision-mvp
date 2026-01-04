@@ -1,18 +1,42 @@
-rules_version='2'
-
+rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Allow public read access to appointments for availability checking
+    match /appointments/{document} {
+      // Allow reading any appointment document
+      allow get: if true;
+      
+      // Allow querying appointments by date range
+      allow list: if request.query != null && 
+                  (request.query.limit != null || 
+                   request.query.where != null ||
+                   request.query.orderBy != null);
+      
+      // Allow creating appointments
+      allow create: if request.auth != null || 
+                   (request.resource.data.userId == 'guest' && 
+                    request.resource.data.userInfo != null);
+      
+      // Allow updates/deletes only by admins or the user who created the appointment
+      allow update, delete: if request.auth != null && 
+                           (request.auth.token.admin == true || 
+                            request.auth.uid == resource.data.userId);
+    }
+    
+    // Default deny all other operations
     match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2026, 1, 29);
+      allow read, write: if false;
+    }
+    
+    // Allow users to read their own data
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow reading public user profile data
+    match /users/{userId}/public {
+      allow read: if true;
     }
   }
 }

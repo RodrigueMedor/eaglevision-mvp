@@ -335,8 +335,8 @@ const Contact = () => {
                     <Phone color="primary" />
                     <Box>
                       <Typography variant="subtitle2" color="textSecondary">Phone</Typography>
-                      <Typography component="a" href="tel:6414514536" sx={{ color: 'text.primary', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
-                        (641) 451-4536
+                      <Typography component="a" href="tel:4074528792" sx={{ color: 'text.primary', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+                        (407) 452-8792
                       </Typography>
                     </Box>
                   </Box>

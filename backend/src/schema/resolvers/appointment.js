@@ -33,31 +33,52 @@ const appointmentResolvers = {
       return snapshot.docs.map(doc => normalizeAppointment(doc));
     },
 
-    async appointment(_, { id }, { db, user }) {
+    async appointment(_, { id }, { db, user, isMockDb }) {
       if (!user) {
         throw new AuthenticationError('Authentication required');
       }
 
-      const doc = await db.collection('appointments').doc(id).get();
-      if (!doc.exists) {
-        throw new UserInputError('Appointment not found');
-      }
+      if (isMockDb) {
+        // Mock database implementation
+        const appointment = db.collections.appointments?.[id];
+        if (!appointment) {
+          throw new UserInputError('Appointment not found');
+        }
+        
+        if (appointment.userId !== user.uid) {
+          throw new AuthenticationError('Unauthorized');
+        }
+        
+        return { id, ...appointment };
+      } else {
+        // Real Firebase implementation
+        const doc = await db.collection('appointments').doc(id).get();
+        if (!doc.exists) {
+          throw new UserInputError('Appointment not found');
+        }
 
-      const data = doc.data();
-      if (data.userId !== user.uid) {
-        throw new AuthenticationError('Unauthorized');
-      }
+        const data = doc.data();
+        if (data.userId !== user.uid) {
+          throw new AuthenticationError('Unauthorized');
+        }
 
-      return normalizeAppointment(doc);
+        return normalizeAppointment(doc);
+      }
     }
   },
 
   Mutation: {
     async createAppointment(_, { input }, { db, user }) {
-      const required = ['service', 'appointmentDate', 'firstName', 'lastName', 'email', 'phone'];
-      const missing = required.filter(f => !input[f]);
+      // Require authentication for creating appointments
+      if (!user) {
+        throw new AuthenticationError('You must be logged in to create an appointment');
+      }
+
+      const required = ['service', 'appointmentDate'];
+      const missing = required.filter(field => !input[field]);
+      
       if (missing.length) {
-        throw new UserInputError(`Missing fields: ${missing.join(', ')}`);
+        throw new UserInputError(`Missing required fields: ${missing.join(', ')}`);
       }
 
       const appointmentDate = new Date(input.appointmentDate);
@@ -65,17 +86,17 @@ const appointmentResolvers = {
         throw new UserInputError('Appointment must be in the future');
       }
 
-      // prevent double booking
+      // Prevent double booking
       const snapshot = await db
-          .collection('appointments')
-          .where('appointmentDate', '==', Timestamp.fromDate(appointmentDate))
-          .get();
+        .collection('appointments')
+        .where('appointmentDate', '==', Timestamp.fromDate(appointmentDate))
+        .get();
 
-      const active = snapshot.docs.filter(
-          d => !['CANCELLED', 'DECLINED'].includes(d.data().status)
+      const activeAppointments = snapshot.docs.filter(
+        doc => !['CANCELLED', 'DECLINED'].includes(doc.data().status)
       );
 
-      if (active.length > 0) {
+      if (activeAppointments.length > 0) {
         throw new UserInputError('Time slot already booked');
       }
 
@@ -83,18 +104,32 @@ const appointmentResolvers = {
       const ssoToken = uuidv4();
       const ref = db.collection('appointments').doc(appointmentId);
 
+      // Get user details from the database
+      const userDoc = await db.collection('users').doc(user.id).get();
+      if (!userDoc.exists) {
+        throw new AuthenticationError('User not found');
+      }
+      const userData = userDoc.data();
+
       const appointmentData = {
         id: appointmentId,
-        userId: user?.uid ?? null,
+        userId: user.id,
+        user: {
+          id: user.id,
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          phone: userData.phone
+        },
         service: input.service,
         appointmentDate: Timestamp.fromDate(appointmentDate),
         status: 'PENDING_SSO',
         notes: input.notes || '',
         documentSigned: false,
-        firstName: input.firstName,
-        lastName: input.lastName,
-        email: input.email,
-        phone: input.phone,
+        firstName: userData.firstName || input.firstName || '',
+        lastName: userData.lastName || input.lastName || '',
+        email: userData.email || input.email || '',
+        phone: userData.phone || input.phone || '',
         ssoToken,
         ssoVerified: false,
         auditLog: [
@@ -102,7 +137,9 @@ const appointmentResolvers = {
             timestamp: Timestamp.now(),
             action: 'APPOINTMENT_CREATED',
             status: 'PENDING_SSO',
-            message: 'Waiting for SSO verification'
+            message: 'Appointment created, waiting for SSO verification',
+            userId: user.id,
+            userEmail: userData.email
           }
         ],
         createdAt: Timestamp.now(),

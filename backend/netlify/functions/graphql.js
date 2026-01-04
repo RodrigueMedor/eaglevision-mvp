@@ -84,7 +84,7 @@ router.get('/test', (req, res) => {
 // Mount the router at the base path
 app.use('/.netlify/functions/graphql', router);
 
-// Create Apollo Server
+// Create Apollo Server with CORS support
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -97,25 +97,8 @@ const server = new ApolloServer({
       path: error.path,
       extensions: {
         code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
-      },
-    };
-  },
-});
-
-// Initialize the server and create the handler
-let handler;
-
-// Create Apollo Server with CORS support
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  formatError: (error) => {
-    console.error('GraphQL Error:', error);
-    return {
-      message: error.message,
-      locations: error.locations,
-      path: error.path,
-      extensions: error.extensions
+        ...error.extensions
+      }
     };
   },
   plugins: [

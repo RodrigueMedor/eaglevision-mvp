@@ -1,16 +1,20 @@
 import { gql } from '@apollo/client';
 
 export const CREATE_CONTACT = gql`
-  mutation CreateContact($input: ContactInput!) {
+  mutation CreateContact($input: CreateContactInput!) {
     createContact(input: $input) {
-      id
-      name
-      email
-      phone
-      subject
+      success
       message
-      status
-      createdAt
+      contact {
+        id
+        name
+        email
+        phone
+        subject
+        message
+        status
+        createdAt
+      }
     }
   }
 `;

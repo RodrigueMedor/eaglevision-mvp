@@ -1,17 +1,37 @@
 [build]
-  # We don't have any static files to publish
-  publish = "public"
   # Directory containing your function files
   functions = "netlify/functions"
   # Command to create a minimal public directory
   command = "npm run build"
 
+[dev]
+  framework = "#custom"
+  command = "npm run start"
+  targetPort = 8888
+
 [functions]
   # Node.js version for Netlify Functions
   node_bundler = "esbuild"
-  external_node_modules = ["firebase-admin"]
+  external_node_modules = ["firebase-admin", "jsonwebtoken", "nodemailer"]
 
-# Redirect all requests to our GraphQL function
+# API Routes
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Email Verification Endpoints
+[[redirects]]
+  from = "/api/send-verification-email"
+  to = "/.netlify/functions/send-verification-email"
+  status = 200
+
+[[redirects]]
+  from = "/api/verify-email"
+  to = "/.netlify/functions/verify-email"
+  status = 200
+
+# GraphQL Endpoint
 [[redirects]]
   from = "/graphql"
   to = "/.netlify/functions/graphql"

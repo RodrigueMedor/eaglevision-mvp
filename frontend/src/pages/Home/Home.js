@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { 
   Box, 
   Button, 
@@ -18,14 +18,17 @@ import {
   useMediaQuery,
   Fade,
   Grow,
-  Chip
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent
 } from '@mui/material';
 import PhoneIcon from '@mui/icons-material/Phone';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import { Link } from 'react-router-dom';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import AppointmentModal from '../../components/AppointmentModal/AppointmentModal';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuthRedirect } from '../../hooks/useAuthRedirect';
+import EmailSignInModal from '../../components/EmailSignInModal/EmailSignInModal';
+import BookAppointmentForm from '../../components/AppointmentModal/BookAppointmentForm';
 import { 
   CheckCircle as CheckCircleIcon, 
   ArrowForward as ArrowForwardIcon,
@@ -33,7 +36,6 @@ import {
   VerifiedUser as VerifiedUserIcon,
   Receipt as ReceiptIcon,
   Assignment as AssignmentIcon,
-  Business as BusinessIcon,
   Translate as TranslateIcon,
   Security as SecurityIcon,
   Speed as SpeedIcon,
@@ -125,21 +127,66 @@ const features = [
 // ];
 
 const Home = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+  
+  const handleAuthSuccess = useCallback((user) => {
+    setShowAppointmentModal(true);
+  }, []);
 
-  const handleBookAppointment = (appointmentData) => {
-    console.log('Appointment booked:', appointmentData);
-    // Here you would typically send the data to your backend
-    // For now, we'll just log it to the console
-  };
+  const handleCloseAppointmentModal = useCallback(() => {
+    setShowAppointmentModal(false);
+  }, []);
+  
+  const {
+    isAuthenticated,
+    showAuthModal,
+    handleAuthAction,
+    handleCloseAuthModal,
+    currentUser
+  } = useAuthRedirect();
+  
+  // Show appointment modal when user becomes authenticated
+  useEffect(() => {
+    if (isAuthenticated && currentUser) {
+      setShowAppointmentModal(true);
+    }
+  }, [isAuthenticated, currentUser]);
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
+  const handleEmailSubmit = async (email) => {
+    try {
+      // Make API call to send verification email
+      const response = await fetch('/api/send-verification-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send verification email');
+      }
+      
+      // Store the email in localStorage for later use
+      localStorage.setItem('pendingVerificationEmail', email);
+      
+      // Show success message
+      return { success: true };
+      
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      throw error; // Let the modal handle the error
+    }
   };
+  
+  const handleBookAppointment = useCallback(() => {
+    handleAuthAction(() => {
+      // This will be called after successful authentication
+      navigate('/appointment');
+    });
+  }, [handleAuthAction, navigate]);
   
   const theme = useTheme();
   // Media query for responsive design
@@ -283,7 +330,7 @@ const Home = () => {
                 <Button
                   variant="contained"
                   color="secondary"
-                  onClick={handleOpenModal}
+                  onClick={handleBookAppointment}
                   size="large"
                   startIcon={<ScheduleIcon />}
                   sx={{
@@ -305,13 +352,30 @@ const Home = () => {
                   Book Your Appointment
                 </Button>
                 
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <AppointmentModal 
-                    open={isModalOpen} 
-                    onClose={handleCloseModal}
-                    onSubmit={handleBookAppointment}
-                  />
-                </LocalizationProvider>
+                <EmailSignInModal 
+                  open={showAuthModal} 
+                  onClose={handleCloseAuthModal}
+                  onEmailSubmit={handleEmailSubmit}
+                  onSuccess={handleAuthSuccess}
+                />
+                
+                {/* Appointment Booking Modal */}
+                <Dialog 
+                  open={showAppointmentModal} 
+                  onClose={handleCloseAppointmentModal}
+                  maxWidth="md"
+                  fullWidth
+                >
+                  <DialogTitle>Book a New Appointment</DialogTitle>
+                  <DialogContent>
+                    <Box sx={{ p: 2 }}>
+                      <BookAppointmentForm 
+                        onClose={handleCloseAppointmentModal}
+                        onSuccess={handleCloseAppointmentModal} 
+                      />
+                    </Box>
+                  </DialogContent>
+                </Dialog>
               </Box>
               
               <Box sx={{ mt: 3, mb: 2 }}>

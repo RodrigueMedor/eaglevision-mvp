@@ -351,20 +351,23 @@ const About = () => {
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, flexWrap: 'wrap', mt: 4 }}>
             <Button
               component="a"
-              href="tel:6414514536"
+              href="tel:4074528792"
               color="primary"
               size="large"
               startIcon={<Phone />}
               sx={{
-                px: 4,
+                bgcolor: 'background.paper',
+                color: 'primary.main',
+                border: '1px solid',
+                borderColor: 'primary.main',
+                px: 3,
                 py: 1.5,
-                fontSize: '1rem',
+                borderRadius: 2,
                 textTransform: 'none',
-                borderRadius: '8px',
                 fontWeight: 600,
               }}
             >
-              Call Us: (641) 451-4536
+              Call Us: (407) 452-8792
             </Button>
             
             <Button

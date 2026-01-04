@@ -3,9 +3,13 @@ import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 
 // HTTP connection to the API
-// Use environment variable or fallback to Netlify function URL
+const isDevelopment = process.env.NODE_ENV === 'development';
+const graphqlUri = isDevelopment 
+  ? 'http://localhost:4000/graphql'  // Local development
+  : 'https://eaglevisionedge.com/.netlify/functions/graphql';  // Production
+
 const httpLink = createHttpLink({
-  uri: 'https://eaglevisionedge.com/.netlify/functions/graphql',
+  uri: graphqlUri,
   credentials: 'include',
   fetchOptions: {
     mode: 'cors',

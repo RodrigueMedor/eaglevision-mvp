@@ -16,8 +16,20 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Initialize Firebase services
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+
+// Initialize Firestore with settings
+export const db = (() => {
+  const dbInstance = getFirestore(app);
+  if (process.env.NODE_ENV === 'development') {
+    // Enable Firestore logging in development
+    console.log('[Firebase] Initializing Firestore in development mode');
+  }
+  return dbInstance;
+})();
+
 export const storage = getStorage(app);
 
 // Initialize Analytics only in production

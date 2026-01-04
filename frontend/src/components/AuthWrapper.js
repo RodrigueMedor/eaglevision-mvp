@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/FirebaseAuthContext';
 import { CircularProgress, Box } from '@mui/material';
 
 const AuthWrapper = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { currentUser, loading } = useAuth();
+  const isAuthenticated = !!currentUser;
+  const isLoading = loading;
   const navigate = useNavigate();
 
   useEffect(() => {
