@@ -1,6 +1,4 @@
 import React from 'react';
-import { useQuery } from '@apollo/client/react/hooks';
-import { GET_ALL_APPOINTMENTS } from '../../graphql/admin';
 import {
   Table,
   TableBody,

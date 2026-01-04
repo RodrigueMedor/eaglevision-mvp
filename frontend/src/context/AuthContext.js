@@ -13,10 +13,6 @@ const isRememberMeEnabled = () => {
   return localStorage.getItem('remember_me') === '1';
 };
 
-// Get the appropriate session timeout based on remember me setting
-const getSessionTimeout = () => {
-  return isRememberMeEnabled() ? REMEMBER_ME_SESSION_TIMEOUT : DEFAULT_SESSION_TIMEOUT;
-};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -161,13 +157,17 @@ export const AuthProvider = ({ children }) => {
     }
 
     // Set new timer
+    const getSessionTimeout = () => {
+      const rememberMe = localStorage.getItem('remember_me') === 'true';
+      return rememberMe ? 24 * 60 * 60 * 1000 : 30 * 60 * 1000; // 24 hours or 30 minutes
+    };
     logoutTimer.current = setTimeout(() => {
       console.log('User inactive, logging out...');
       if (logoutRef.current) {
         logoutRef.current();
       }
     }, getSessionTimeout());
-  }, [logoutRef, getSessionTimeout]);
+  }, [logoutRef]);
 
   // Set up event listeners for user activity
   useEffect(() => {

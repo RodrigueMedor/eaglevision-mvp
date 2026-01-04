@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { 
   Box, 
   Button,
@@ -165,8 +164,6 @@ const groupTimeSlots = (slots) => {
 
 const BookAppointmentForm = ({ onClose, onSuccess }) => {
   const { currentUser } = useAuth();
-  const navigate = useNavigate();
-  const theme = useTheme();
 
   // Form state
   const [error, setError] = useState('');
@@ -176,8 +173,6 @@ const BookAppointmentForm = ({ onClose, onSuccess }) => {
   const [touched, setTouched] = useState({});
   const [timeSlots, setTimeSlots] = useState([]);
   const [timeSlotsGrouped, setTimeSlotsGrouped] = useState({});
-  const [isLoadingSlots, setIsLoadingSlots] = useState(true);
-  const [slotError, setSlotError] = useState('');
   
   const [formData, setFormData] = useState({
     firstName: '',

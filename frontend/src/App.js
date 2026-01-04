@@ -2,8 +2,7 @@ import React from 'react';
 import { 
   Routes, 
   Route, 
-  Navigate, 
-  Outlet 
+  Navigate
 } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';

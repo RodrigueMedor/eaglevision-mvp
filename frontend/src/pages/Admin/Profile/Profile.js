@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Box, 
   Typography, 
@@ -100,6 +100,15 @@ const Profile = () => {
     },
   });
 
+  // Show snackbar notification
+  const showSnackbar = useCallback((message, severity = 'info') => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
+  }, []);
+
   // Fetch profile data on component mount
   useEffect(() => {
     const fetchProfile = async () => {
@@ -123,16 +132,7 @@ const Profile = () => {
     };
 
     fetchProfile();
-  }, []);
-
-  // Show snackbar notification
-  const showSnackbar = (message, severity = 'info') => {
-    setSnackbar({
-      open: true,
-      message,
-      severity,
-    });
-  };
+  }, [profileForm, showSnackbar]);
 
   // Handle file upload
   const handleFileUpload = async (event) => {
