@@ -6,15 +6,12 @@ import {
   Typography, 
   Paper, 
   Button, 
-  useTheme,
-  useMediaQuery,
   Card,
   CardContent,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Chip
 } from '@mui/material';
 import { 
   Receipt as ReceiptIcon,
