@@ -1,0 +1,61 @@
+functionsDirectory = "/Users/rodriguemedor/Documents/business/good/eaglevision-mvp/frontend/netlify/functions"
+functionsDirectoryOrigin = "ui"
+headersOrigin = "config"
+redirectsOrigin = "config"
+plugins = []
+
+[dev]
+command = "npm start"
+port = 3000.0
+publish = "build"
+targetPort = 3000.0
+
+[functions]
+
+[functions."*"]
+
+[build]
+publish = "/Users/rodriguemedor/Documents/business/good/eaglevision-mvp/frontend/build"
+publishOrigin = "config"
+commandOrigin = "config"
+base = "/Users/rodriguemedor/Documents/business/good/eaglevision-mvp/frontend"
+command = "npm run build"
+functions = "/Users/rodriguemedor/Documents/business/good/eaglevision-mvp/frontend/netlify/functions"
+
+[build.environment]
+NODE_VERSION = "16"
+NPM_FLAGS = "--legacy-peer-deps"
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[[headers]]
+for = "/*"
+
+[headers.values]
+X-Frame-Options = "DENY"
+X-XSS-Protection = "1; mode=block"
+X-Content-Type-Options = "nosniff"
+Referrer-Policy = "strict-origin-when-cross-origin"
+Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://eaglevisionedge.com/.netlify/functions/ https://*.google-analytics.com;"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]

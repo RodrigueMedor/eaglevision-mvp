@@ -1,0 +1,21 @@
+{
+	"siteId": "8d29de95-529b-4f72-bce3-9526fb3039ed",
+	"geolocation": {
+		"data": {
+			"city": "Kissimmee",
+			"country": {
+				"code": "US",
+				"name": "United States"
+			},
+			"subdivision": {
+				"code": "FL",
+				"name": "Florida"
+			},
+			"timezone": "America/New_York",
+			"latitude": 28.3056,
+			"longitude": -81.4197,
+			"postalCode": "34741"
+		},
+		"timestamp": 1767465839424
+	}
+}

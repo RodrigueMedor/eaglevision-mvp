@@ -1,0 +1,140 @@
+functionsDirectory = "/Users/rodriguemedor/Documents/business/good/eaglevision-mvp/netlify/functions"
+functionsDirectoryOrigin = "config-v1"
+headersOrigin = "config"
+redirectsOrigin = "config"
+
+[build]
+publish = "/Users/rodriguemedor/Documents/business/good/eaglevision-mvp/frontend/build"
+publishOrigin = "config"
+commandOrigin = "config"
+command = "npm run build"
+functions = "/Users/rodriguemedor/Documents/business/good/eaglevision-mvp/netlify/functions"
+
+[build.environment]
+NODE_VERSION = "18"
+NPM_FLAGS = "--legacy-peer-deps --force"
+NPM_VERBOSE = "true"
+NODE_ENV = "production"
+REACT_APP_API_URL = "https://api.eaglevisionedge.com"
+REACT_APP_GA_TRACKING_ID = ""
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
+
+[functions]
+
+[functions."*"]
+included_files = []
+external_node_modules = ["firebase-admin", "graphql-scalars", "lodash"]
+node_bundler = "esbuild"
+
+[[plugins]]
+origin = "config"
+package = "@netlify/plugin-functions-install-core"
+
+[plugins.inputs]
+
+[[headers]]
+for = "/*"
+
+[headers.values]
+Content-Security-Policy = "default-src 'self';\n      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://*.docusign.net;\n      style-src 'self' 'unsafe-inline';\n      img-src 'self' data: https: https://*.docusign.net;\n      font-src 'self' data: https:;\n      connect-src 'self' https://eaglevisionedge.com/.netlify/functions/ https://*.google-analytics.com https://*.docusign.net https://*.docusign.com;\n      frame-ancestors 'none';"
+Referrer-Policy = "same-origin"
+X-Content-Type-Options = "nosniff"
+X-Frame-Options = "DENY"
+X-XSS-Protection = "1; mode=block"
+
+[[redirects]]
+from = "/api/*"
+to = "/.netlify/functions/:splat"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/graphql"
+to = "/.netlify/functions/graphql"
+status = 200.0
+force = true
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/*"
+to = "/:splat"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+Host = ["eaglevisionedge.com"]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/*"
+to = "https://www.eaglevisionedge.com/:splat"
+status = 301.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+Host = ["eaglevisionedge.com"]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/health"
+to = "/.netlify/functions/graphql/health"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/test"
+to = "/.netlify/functions/graphql/test"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
