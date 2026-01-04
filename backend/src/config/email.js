@@ -5,7 +5,7 @@ module.exports = {
   emailService: process.env.EMAIL_SERVICE || 'gmail',
   emailUser: process.env.EMAIL_USER || process.env.SENDGRID_USERNAME,
   emailPassword: process.env.EMAIL_PASSWORD || process.env.SENDGRID_PASSWORD,
-  emailFrom: process.env.EMAIL_FROM || 'noreply@eaglevisionedge.com',
+  emailFrom: process.env.EMAIL_FROM || 'info@eaglevisionedge.com',
   
   // Frontend URL for verification links
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',

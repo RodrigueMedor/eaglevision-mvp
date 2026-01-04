@@ -13,7 +13,7 @@ module.exports = {
     jwtSecret: process.env.JWT_SECRET || 'dev-jwt-secret'
   },
   email: {
-    from: process.env.EMAIL_FROM || 'noreply@eaglevisionedge.com',
+    from: process.env.EMAIL_FROM || 'info@eaglevisionedge.com',
     service: process.env.EMAIL_SERVICE || 'gmail',
     user: process.env.EMAIL_USER,
     password: process.env.EMAIL_PASSWORD
