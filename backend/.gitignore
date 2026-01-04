@@ -95,6 +95,44 @@ Thumbs.db
 .tmp/
 build/
 
+# Node.js and npm cache directories
+.npm
+.eslintcache
+
+# Cache directories
+.cache/
+.parcel-cache/
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Webpack cache
+.webpack/
+
+# Vite cache
+.vite/
+
+# Babel cache
+.babelcache
+
+# Yarn v2+ cache
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Package manager cache directories
+node_modules/.cache/
+frontend/node_modules/.cache/
+**/node_modules/.cache/
+
+# Next.js cache
+.next/cache/
+frontend/.next/cache/
+**/.next/cache/
+
 # ==============================
 # Backend Specific
 # ==============================
