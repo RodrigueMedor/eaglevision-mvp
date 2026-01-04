@@ -63,25 +63,14 @@ backend/
 └── package.json              # Dependencies and scripts
 ```
 
-## Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| PORT | Server port | 4000 |
-| NODE_ENV | Node environment | development |
-| FRONTEND_URL | URL of the frontend for CORS | http://localhost:3000 |
-| JWT_SECRET | Secret key for JWT tokens | - |
-| JWT_EXPIRES_IN | JWT token expiration | 1d |
-| REFRESH_TOKEN_EXPIRES_IN | Refresh token expiration | 7d |
-
 ## Deployment
 
 For production deployment, make sure to:
 
-1. Set `NODE_ENV=production`
-2. Set proper CORS origins
-3. Use HTTPS in production
-4. Set up proper logging and monitoring
+
+1. Set proper CORS origins
+2. Use HTTPS in production
+3. Set up proper logging and monitoring
 
 ## License
 

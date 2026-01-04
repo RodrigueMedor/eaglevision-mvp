@@ -1,14 +1,14 @@
-require('dotenv').config();
+// Environment variables are loaded in config.js
+const config = require('../../config/config');
 
 module.exports = {
   // Email service configuration
-  emailService: process.env.EMAIL_SERVICE || 'gmail',
-  emailUser: process.env.EMAIL_USER || process.env.SENDGRID_USERNAME,
-  emailPassword: process.env.EMAIL_PASSWORD || process.env.SENDGRID_PASSWORD,
-  emailFrom: process.env.EMAIL_FROM || 'info@eaglevisionedge.com',
+  emailService: 'sendgrid', // Using SendGrid as the email service
+  sendgridApiKey: config.email.sendgridApiKey,
+  emailFrom: config.email.from,
   
   // Frontend URL for verification links
-  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+  frontendUrl: config.app.frontendUrl,
   
   // Email templates
   templates: {

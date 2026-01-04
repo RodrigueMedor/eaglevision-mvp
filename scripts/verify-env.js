@@ -17,7 +17,7 @@ const requiredVars = [
 
 // Optional environment variables with defaults
 const optionalVars = {
-  'EMAIL_FROM': 'noreply@eaglevisionedge.com',
+  'EMAIL_FROM': 'info@eaglevisionedge.com',
   'EMAIL_SERVICE': 'gmail',
   'COOKIE_DOMAIN': 'localhost'
 };

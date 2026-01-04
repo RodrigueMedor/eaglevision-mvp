@@ -21,6 +21,28 @@
   external_node_modules = ["firebase-admin", "graphql-scalars", "lodash", "graphql-type-json"]
   included_files = ["node_modules/graphql-type-json/**"]
 
+# Configure secrets scanning
+[build.processing]
+  skip_processing = false
+
+# Ignore false positives in secret scanning
+[build.processing.secrets_scan]
+  enabled = true
+  skip_paths = [
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/venv/**",
+    "**/__pycache__/**",
+    "**/*.log",
+    "**/build/**",
+    "**/dist/**",
+    "**/package-lock.json",
+    "**/yarn.lock",
+    "**/README.md",
+    "**/*.pyc"
+  ]
+  skip_keys = ["NODE_ENV", "EMAIL_FROM"]
+
 # Environment variables for build
 [context.production.environment]
   NODE_ENV = "production"

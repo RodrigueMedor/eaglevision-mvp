@@ -78,3 +78,202 @@ frontend/.next/
 # Backend build
 backend/build/
 backend/.pytest_cache/
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Production
+/build
+
+# Environment variables
+.env
+.env.*
+!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Secrets and sensitive data
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.pem
+*.cer
+*.crt
+*.pub
+id_rsa*
+id_dsa*
+id_ecdsa*
+id_ed25519*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local development
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local Netlify folder
+.netlify/
+
+# Build artifacts
+/dist
+/out
+.next/
+.nuxt/
+.cache/
+.temp/
+.tmp/
+
+# Debug logs
+debug.log
+
+# Local development environment
+.local/
+
+# Environment specific
+config/local.*.js
+config/*.local.js
+
+# Misc
+.vercel
+.vercel_build_output/
+.vercel_build_output/
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.netlify
+.netlify/
+.netlify/functions-serve/
+.netlify/functions-internal/
+
+# Firebase
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+
+# Firebase Service Account Key
+**/config/firebase/serviceAccountKey.json
+**/serviceAccountKey.json
+
+# Backend specific
+/backend/node_modules/
+/backend/.env
+/backend/.env.*
+
+# Frontend
+frontend/node_modules/
+frontend/build/
+frontend/.env
+frontend/.env.*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build directories
+.next/
+/out/
+
+# Misc
+.DS_Store
+*.pem
+
+.env           # Ignores the .env file
+.env.*
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Firebase
+backend/config/firebase/serviceAccountKey.json
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+
+# Firebase
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+ENV/
+
+# Local development
+*.local
+
+# Build output
+build/
+dist/
+
+# Netlify
+.netlify/
+
+# Node modules
+node_modules/
+.env
+.env.example
+
+# Frontend build
+frontend/build/
+frontend/.next/
+
+# Backend build
+backend/build/
+backend/.pytest_cache/
