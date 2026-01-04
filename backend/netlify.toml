@@ -1,4 +1,6 @@
 [build]
+  command = "cd backend && npm install && npm run build"
+  publish = "frontend/build"
   # Directory containing your function files
   functions = "netlify/functions"
   # Command to create a minimal public directory
