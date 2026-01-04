@@ -1,5 +1,5 @@
 [build]
-  command = "cd backend && npm install && cd .. && npm run build"
+  command = "npm install && cd backend && npm install && cd .. && npm run build"
   publish = "frontend/build"
   functions = "netlify/functions"
 
@@ -19,13 +19,15 @@
 # Functions configuration
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["firebase-admin", "graphql-scalars", "lodash"]
-  # Don't include the entire firebase directory, load config at runtime
-  included_files = []
+  external_node_modules = ["firebase-admin", "graphql-scalars", "lodash", "graphql-type-json"]
+  # Include node_modules for all dependencies
+  included_files = ["node_modules/graphql-type-json/**"]
 
 # Netlify Functions Install Core plugin
 [[plugins]]
   package = "@netlify/plugin-functions-install-core"
+  [plugins.inputs]
+    functions = "netlify/functions"
 
 # Environment variables for build
 [context.production.environment]
