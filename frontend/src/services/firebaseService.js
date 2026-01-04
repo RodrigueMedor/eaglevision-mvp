@@ -10,8 +10,7 @@ import {
   query, 
   where,
   serverTimestamp,
-  setDoc,
-  Timestamp
+  setDoc
 } from 'firebase/firestore';
 
 // Generic CRUD operations
