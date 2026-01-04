@@ -11,13 +11,11 @@ import {
   Alert,
   useTheme,
   useMediaQuery,
-  TextField,
-  MenuItem,
   TablePagination,
   TableContainer,
   IconButton,
   CircularProgress
-} from '@mui/material';
+} from '@mui/material'; // Added back TableContainer that's being used
 import { 
   FirstPage as FirstPageIcon,
   LastPage as LastPageIcon,
@@ -122,10 +120,11 @@ TablePaginationActions.propTypes = {
 };
 
 function AdminDashboard() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  // Removed unused logout function
   
   // State management
   const [snackbar, setSnackbar] = useState({
@@ -197,16 +196,7 @@ function AdminDashboard() {
     );
   }, [appointmentsData, page, rowsPerPage]);
 
-  const { 
-    loading: loadingContacts, 
-    error: contactsError,
-    refetch: refetchContacts 
-  } = useQuery(GET_ALL_CONTACTS, { 
-    fetchPolicy: 'network-only',
-    onError: (error) => {
-      console.error('Contacts query error:', error);
-    }
-  });
+  // Removed unused contacts query since it's not being used in the component
   
   // Log data and errors for debugging
   React.useEffect(() => {

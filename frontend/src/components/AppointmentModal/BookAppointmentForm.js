@@ -185,8 +185,8 @@ const BookAppointmentForm = ({ onClose, onSuccess }) => {
   });
   
   // Loading and error states for time slots
-  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
-  const [slotError, setSlotError] = useState('');
+  const [, setIsLoadingSlots] = useState(false);
+  const [, setSlotError] = useState('');
   
   // Load time slots when the component mounts and when the selected date changes
   useEffect(() => {
@@ -498,11 +498,7 @@ const BookAppointmentForm = ({ onClose, onSuccess }) => {
     }
   };
 
-  // Check if a date is disabled (weekends)
-  const isWeekend = (date) => {
-    const day = date.getDay();
-    return day === 0 || day === 6; // Sunday or Saturday
-  };
+  // isWeekend function removed as it's not being used
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>

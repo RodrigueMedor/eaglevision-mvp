@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -42,7 +42,7 @@ const AppointmentCalendar = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   // Fetch appointments
-  const { data, loading, error, refetch } = useQuery(GET_ALL_APPOINTMENTS, {
+  const { data, refetch } = useQuery(GET_ALL_APPOINTMENTS, {
     fetchPolicy: 'network-only',
   });
 

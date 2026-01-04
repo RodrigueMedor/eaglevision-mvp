@@ -3,6 +3,14 @@
   publish = "frontend/build"
   functions = "netlify/functions"
 
+[dev]
+  # Run the React app on port 3000
+  port = 3000
+  # Proxy API requests to the backend on port 3001
+  targetPort = 3001
+  # Auto-launch the site in your browser
+  autoLaunch = true
+
 [build.environment]
   NODE_VERSION = "18"
   NPM_FLAGS = "--legacy-peer-deps --force"
