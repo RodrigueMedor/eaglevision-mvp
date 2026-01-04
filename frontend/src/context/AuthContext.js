@@ -13,6 +13,11 @@ const isRememberMeEnabled = () => {
   return localStorage.getItem('remember_me') === '1';
 };
 
+// Get session timeout duration in milliseconds
+const getSessionTimeout = () => {
+  // 30 minutes in milliseconds
+  return 30 * 60 * 1000;
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);

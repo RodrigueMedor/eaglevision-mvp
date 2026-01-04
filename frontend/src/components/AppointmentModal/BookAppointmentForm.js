@@ -185,6 +185,10 @@ const BookAppointmentForm = ({ onClose, onSuccess }) => {
     notes: ''
   });
   
+  // Loading and error states for time slots
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
+  const [slotError, setSlotError] = useState('');
+  
   // Load time slots when the component mounts and when the selected date changes
   useEffect(() => {
     const loadTimeSlots = async () => {
