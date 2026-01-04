@@ -124,9 +124,12 @@ build/
 .pnp.*
 
 # Package manager cache directories
-node_modules/.cache/
-frontend/node_modules/.cache/
-**/node_modules/.cache/
+node_modules/.cache/**/*.pack
+node_modules/.cache/**/*.cache
+frontend/node_modules/.cache/**/*.pack
+frontend/node_modules/.cache/**/*.cache
+**/node_modules/.cache/**/*.pack
+**/node_modules/.cache/**/*.cache
 
 # Next.js cache
 .next/cache/
