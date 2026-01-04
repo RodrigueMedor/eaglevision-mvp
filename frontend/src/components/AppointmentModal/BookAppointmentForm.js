@@ -13,7 +13,6 @@ import {
   Select,
   CircularProgress,
   Alert,
-  useTheme,
   Container,
   Divider,
   InputAdornment,
@@ -411,7 +410,6 @@ const BookAppointmentForm = ({ onClose, onSuccess }) => {
       // Format the appointment date and time
       const time24 = formData.time;
       const [hours, minutes] = time24.split(':').map(Number);
-      const period = hours >= 12 ? 'PM' : 'AM';
       
       // Check if the selected time slot is still available
       const isAvailable = await checkTimeSlotAvailability(formData.date, time24);
@@ -498,11 +496,6 @@ const BookAppointmentForm = ({ onClose, onSuccess }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Format date for display
-  const formatDisplayDate = (date) => {
-    return date ? format(date, 'EEEE, MMMM d, yyyy') : '';
   };
 
   // Check if a date is disabled (weekends)

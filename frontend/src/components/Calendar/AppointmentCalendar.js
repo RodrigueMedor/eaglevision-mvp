@@ -27,7 +27,6 @@ import {
   MoreVert as MoreVertIcon,
   Add as AddIcon,
   Refresh as RefreshIcon,
-  FilterList as FilterListIcon
 } from '@mui/icons-material';
 import { useQuery, useMutation } from '@apollo/client/react/hooks';
 import { GET_ALL_APPOINTMENTS } from '../../graphql/admin';
@@ -42,11 +41,6 @@ const AppointmentCalendar = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [filters, setFilters] = useState({
-    status: ['pending', 'confirmed', 'completed'],
-    service: []
-  });
-
   // Fetch appointments
   const { data, loading, error, refetch } = useQuery(GET_ALL_APPOINTMENTS, {
     fetchPolicy: 'network-only',
