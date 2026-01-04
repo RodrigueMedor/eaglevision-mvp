@@ -130,6 +130,8 @@ dist/
 
 # Node modules
 node_modules/
+.env
+.env.example
 
 # Frontend build
 frontend/build/

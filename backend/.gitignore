@@ -71,6 +71,9 @@ node_modules/
 # Frontend build
 frontend/build/
 frontend/.next/
+.env
+.env.example
+
 
 # Backend build
 backend/build/
