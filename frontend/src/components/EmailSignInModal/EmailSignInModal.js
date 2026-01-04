@@ -166,7 +166,6 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isLoading = isSubmitting || loginLoading || signupLoading;
   const [error, setError] = useState('');
   const [verificationSent, setVerificationSent] = useState(false);
 

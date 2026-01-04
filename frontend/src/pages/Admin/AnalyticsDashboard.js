@@ -92,7 +92,6 @@ const AnalyticsDashboard = () => {
       let yPos = 20;
       const pageWidth = doc.internal.pageSize.getWidth();
       const textPadding = 14;
-      const lineHeight = 7;
       const col1 = 20;
       const col2 = 100;
       const col3 = 150;

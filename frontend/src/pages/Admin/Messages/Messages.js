@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useTheme } from '@mui/material/styles';
 import MessageForm from './MessageForm';
 import {
@@ -8,91 +8,21 @@ import {
   Tabs,
   Tab,
   useMediaQuery,
-  Table,
-  TableBody,
-  TableCell,
   TableContainer,
+  Table,
   TableHead,
+  TableBody,
   TableRow,
-  TablePagination,
-  IconButton,
+  TableCell,
   Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   CircularProgress,
   Snackbar,
   Alert,
-  Chip,
-  Avatar,
-  Tooltip,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemAvatar,
-  Badge,
-  Menu,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
-  OutlinedInput,
-  InputAdornment,
-  Card,
-  CardContent,
-  CardHeader,
-  CardActions,
-  CardActionArea,
-  Collapse,
-  Fade,
-  Slide,
-  Zoom,
-  useScrollTrigger,
-  AppBar,
-  Toolbar,
-  Drawer,
-  ListItemIcon,
-  ListItemSecondaryAction,
-  Checkbox,
-  FormControlLabel,
-  Switch,
-  Radio,
-  RadioGroup,
-  FormLabel,
-  FormGroup,
-  FormHelperText,
-  Breadcrumbs,
-  Link,
-  Stepper,
-  Step,
-  StepLabel,
-  StepContent,
-  MobileStepper,
-  ToggleButton,
-  ToggleButtonGroup,
-  SpeedDial,
-  SpeedDialAction,
-  SpeedDialIcon,
-  AlertTitle,
-  Autocomplete,
-  Pagination,
-  PaginationItem,
-  Rating,
-  Skeleton,
-  TabContext,
-  TabList,
-  TabPanel,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineOppositeContent,
-  TimelineDot,
-  TableFooter
+  Chip
 } from '@mui/material';
 import {
   Message as MessageIcon,
@@ -246,17 +176,17 @@ const Messages = () => {
   };
 
   // Handle page change with debounced refetch
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = useCallback((event, newPage) => {
     setPage(newPage);
     debouncedRefetch({
       type: tabValue === 0 ? 'all' : tabValue === 1 ? 'inbox' : 'sent',
-      page: newPage + 1,
+      page: newPage + 1, // +1 because backend is 1-indexed
       limit: rowsPerPage,
     });
-  };
+  }, [debouncedRefetch, tabValue, rowsPerPage]);
 
   // Handle rows per page change
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = useCallback((event) => {
     const newRowsPerPage = parseInt(event.target.value, 10);
     setRowsPerPage(newRowsPerPage);
     setPage(0);
@@ -265,7 +195,7 @@ const Messages = () => {
       page: 1,
       limit: newRowsPerPage,
     });
-  };
+  }, [debouncedRefetch, tabValue]);
 
   const [deleteMessage] = useMutation(DELETE_MESSAGE, {
     onCompleted: () => {
@@ -669,7 +599,7 @@ const Messages = () => {
                               </TableCell>
                               <TableCell>
                                 <Chip 
-                                  label={recipient.status}
+                                  label={recipient.status || 'unknown'}
                                   size="small"
                                   color={getStatusColor(recipient.status)}
                                   variant="outlined"

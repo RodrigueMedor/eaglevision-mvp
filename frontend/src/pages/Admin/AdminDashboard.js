@@ -120,7 +120,7 @@ TablePaginationActions.propTypes = {
 };
 
 function AdminDashboard() {
-  const { user } = useAuth();
+  const { user } = useAuth(); // Used in the component's logic
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));

@@ -49,18 +49,6 @@ const Login = () => {
     }
   };
   
-  const handleGoogleSignIn = async () => {
-    try {
-      setIsLoading(true);
-      await signInWithGoogle();
-      navigate(from, { replace: true });
-    } catch (error) {
-      setAuthError(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
   // Clear error when user starts typing
   const handleEmailChange = (e) => {
     setEmail(e.target.value);

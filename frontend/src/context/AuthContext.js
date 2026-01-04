@@ -4,15 +4,6 @@ import axios from 'axios';
 
 const AuthContext = createContext(null);
 
-// Session timeout settings
-const DEFAULT_SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
-const REMEMBER_ME_SESSION_TIMEOUT = 30 * 24 * 60 * 60 * 1000; // 30 days
-
-// Move isRememberMeEnabled outside the component to avoid initialization issues
-const isRememberMeEnabled = () => {
-  return localStorage.getItem('remember_me') === '1';
-};
-
 // Get session timeout duration in milliseconds
 const getSessionTimeout = () => {
   // 30 minutes in milliseconds

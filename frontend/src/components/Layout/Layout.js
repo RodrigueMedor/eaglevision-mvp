@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Box } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/FirebaseAuthContext';

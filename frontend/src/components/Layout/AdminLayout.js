@@ -21,14 +21,12 @@ import {
   Menu,
   MenuItem,
   Badge,
-  Paper,
   Breadcrumbs,
   Link as MuiLink
 } from '@mui/material';
 import {
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
-  ChevronRight as ChevronRightIcon,
   Dashboard as DashboardIcon,
   CalendarMonth as AppointmentsIcon,
   CalendarMonth as CalendarIcon,

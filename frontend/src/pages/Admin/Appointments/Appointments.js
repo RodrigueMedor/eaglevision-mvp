@@ -18,19 +18,11 @@ import {
   Snackbar,
   Alert,
   TablePagination,
-  Tabs,
-  Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   IconButton,
-  Grid
+  Grid,
+  TableContainer
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { 
   FirstPage as FirstPageIcon,
@@ -267,11 +259,6 @@ const Appointments = () => {
     refetchQueries: [{ query: GET_ALL_APPOINTMENTS }],
     awaitRefetchQueries: true
   });
-
-  // Handle new appointment
-  const handleNewAppointment = () => {
-    navigate('/admin/appointments/new');
-  };
 
   // Handle edit appointment
   const handleEdit = (appointment) => {

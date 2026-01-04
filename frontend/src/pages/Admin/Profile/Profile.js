@@ -49,9 +49,7 @@ const Profile = () => {
     message: '',
     severity: 'success',
   });
-  const [isUploading, setIsUploading] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
-  const [isEditingPassword, setIsEditingPassword] = useState(false);
 
   // Initialize formik for profile form
   const profileForm = useFormik({
@@ -88,7 +86,6 @@ const Profile = () => {
       try {
         await changePassword(values.currentPassword, values.newPassword);
         resetForm();
-        setIsEditingPassword(false);
         showSnackbar('Password updated successfully', 'success');
       } catch (error) {
         console.error('Error changing password:', error);
@@ -101,13 +98,13 @@ const Profile = () => {
   });
 
   // Show snackbar notification
-  const showSnackbar = useCallback((message, severity = 'info') => {
+  const showSnackbar = (message, severity = 'info') => {
     setSnackbar({
       open: true,
       message,
       severity,
     });
-  }, []);
+  };
 
   // Fetch profile data on component mount
   useEffect(() => {
@@ -139,7 +136,6 @@ const Profile = () => {
     const file = event.target.files[0];
     if (!file) return;
 
-    setIsUploading(true);
     try {
       const result = await uploadProfilePicture(file);
       setProfileImage(result.profile_picture_url);
@@ -148,8 +144,6 @@ const Profile = () => {
       console.error('Error uploading profile picture:', error);
       const message = error.response?.data?.detail || 'Failed to upload profile picture';
       showSnackbar(message, 'error');
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -157,7 +151,6 @@ const Profile = () => {
   const handleRemovePicture = async () => {
     if (!profileImage) return;
     
-    setIsUploading(true);
     try {
       await deleteProfilePicture();
       setProfileImage(null);
@@ -166,8 +159,6 @@ const Profile = () => {
       console.error('Error removing profile picture:', error);
       const message = error.response?.data?.detail || 'Failed to remove profile picture';
       showSnackbar(message, 'error');
-    } finally {
-      setIsUploading(false);
     }
   };
 

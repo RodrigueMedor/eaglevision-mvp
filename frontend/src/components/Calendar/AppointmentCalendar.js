@@ -11,7 +11,6 @@ import {
   Dialog, 
   DialogTitle, 
   DialogContent, 
-  DialogActions,
   useTheme,
   useMediaQuery,
   IconButton,
@@ -31,7 +30,6 @@ import {
 import { useQuery, useMutation } from '@apollo/client/react/hooks';
 import { GET_ALL_APPOINTMENTS } from '../../graphql/admin';
 import AppointmentForm from '../../pages/Admin/AppointmentForm';
-import { format } from 'date-fns';
 
 const AppointmentCalendar = () => {
   const theme = useTheme();
