@@ -2,7 +2,7 @@ const admin = require('firebase-admin');
 
 class SecureConfig {
   static async getFirebaseConfig() {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.APP_ENV === 'development') {
       // In development, use environment variable if available, otherwise try to require the file
       if (process.env.FIREBASE_SERVICE_ACCOUNT) {
         return JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -23,7 +23,7 @@ class SecureConfig {
   }
 
   static getDocusignPrivateKey() {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.APP_ENV === 'development') {
       // In development, try to read from file if env var not set
       if (process.env.DOCUSIGN_PRIVATE_KEY_PATH) {
         return process.env.DOCUSIGN_PRIVATE_KEY_PATH;

@@ -10,7 +10,7 @@ const {
   SENDGRID_API_KEY = '2YNkxZ9US3WeK8i16ew3Ww',
   JWT_SECRET = 'test-secret-change-in-production',
   FRONTEND_URL = 'http://localhost:3000',
-  NODE_ENV = 'development'
+  APP_ENV = 'development'
 } = process.env;
 
 // Log environment variables for debugging (safely)
@@ -21,7 +21,7 @@ console.log('Environment variables:', {
   SMTP_PASS: SMTP_PASS ? '***' : 'Not set',
   JWT_SECRET: JWT_SECRET ? '***' : 'Not set',
   FRONTEND_URL,
-  NODE_ENV
+  APP_ENV
 });
 
 // Simple email validation
@@ -105,7 +105,7 @@ exports.handler = async (event) => {
         pass: SMTP_PASS
       },
       logger: true, // log to console
-      debug: NODE_ENV === 'development' // include SMTP traffic in the logs
+      debug: APP_ENV === 'development' // include SMTP traffic in the logs
     });
 
     // Verify connection configuration
@@ -144,7 +144,7 @@ exports.handler = async (event) => {
     console.log('Sending verification email to:', email);
     
     // Add a test email for Ethereal in development
-    if (NODE_ENV === 'development' && email === 'test@example.com') {
+    if (APP_ENV === 'development' && email === 'test@example.com') {
       console.warn('Using test@example.com in development - using Ethereal test account');
       mailOptions.to = SMTP_USER; // Send to self in development
     }
@@ -157,7 +157,7 @@ exports.handler = async (event) => {
       console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
     }
     
-    if (NODE_ENV === 'development') {
+    if (APP_ENV === 'development') {
       console.log('Ethereal test account:', {
         user: SMTP_USER,
         pass: SMTP_PASS,
@@ -207,7 +207,7 @@ exports.handler = async (event) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         error: errorMessage,
-        ...(NODE_ENV === 'development' && { 
+        ...(APP_ENV === 'development' && { 
           details: errorDetails,
           stack: error.stack 
         })

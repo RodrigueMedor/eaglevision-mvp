@@ -44,12 +44,12 @@
 
 # Environment variables for build
 [context.production.environment]
-  NODE_ENV = "production"
+  APP_ENV = "production"
   REACT_APP_API_URL = "https://api.eaglevisionedge.com"
   REACT_APP_GA_TRACKING_ID = ""
 
 [context.deploy-preview.environment]
-  NODE_ENV = "staging"
+  APP_ENV = "staging"
   REACT_APP_API_URL = "https://staging-api.eaglevisionedge.com"
 
 [context.develop]

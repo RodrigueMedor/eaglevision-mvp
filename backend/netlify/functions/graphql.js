@@ -40,7 +40,7 @@ const corsOptions = {
       return false;
     });
     
-    if (process.env.NODE_ENV === 'development' || isAllowed) {
+    if (process.env.APP_ENV === 'development' || isAllowed) {
       callback(null, true);
     } else {
       console.warn('CORS blocked request from origin:', origin);
@@ -172,7 +172,7 @@ app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
   res.status(500).json({
     error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : err.message
+    message: process.env.APP_ENV === 'production' ? 'Something went wrong' : err.message
   });
 });
 
@@ -184,7 +184,7 @@ module.exports.handler = async (event, context) => {
 };
 
 // For local development
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.APP_ENV !== 'production') {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, async () => {
     await initialization;
