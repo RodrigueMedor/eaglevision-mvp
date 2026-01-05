@@ -1,41 +1,35 @@
 [build]
-  command = "npm install && npm run build"
-  publish = "build"
-  functions = "netlify/functions"
+  command = "cd backend && npm install && npm run build"
+  publish = "backend/build"
+  functions = "backend/netlify/functions"
 
 [dev]
   framework = "#custom"
-  command = "npm run start"
+  command = "cd backend && npm run start"
   targetPort = 4000
   target = "http://localhost:4000"
-  publish = "build"
+  publish = "backend/build"
   port = 8888
   autoLaunch = true
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = [
-    "firebase-admin", 
-    "jsonwebtoken", 
-    "nodemailer", 
-    "graphql-type-json", 
-    "@graphql-tools/schema",
-    "@apollo/server",
-    "graphql"
-  ]
+  # Only externalize modules that should not be bundled
+  external_node_modules = ["firebase-admin"]
   
   included_files = [
-    "node_modules/graphql-type-json/**", 
-    "node_modules/@graphql-tools/**", 
-    "node_modules/graphql/**",
-    "node_modules/@apollo/**",
-    "src/**/*.js"
+    "backend/node_modules/**",
+    "backend/src/**/*.js"
   ]
   
   [functions.graphql]
     node_bundler = "esbuild"
     timeout = 30  # seconds
     node_version = "18"  # Use Node.js 18 LTS
+    included_files = [
+      "backend/node_modules/**",
+      "backend/src/**/*.js"
+    ]
 
 # API Routes
 [[redirects]]
