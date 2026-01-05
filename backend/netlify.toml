@@ -16,16 +16,20 @@
 [[plugins]]
   package = "@netlify/plugin-functions"
 
+# Ensure Netlify installs dependencies declared for Functions
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
+
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["firebase-admin"]
+  external_node_modules = ["firebase-admin", "jsonwebtoken", "bcryptjs"]
   included_files = ["node_modules/**"]
   
   [functions.graphql]
     node_bundler = "esbuild"
     timeout = 30  # seconds
     node_version = "18"
-    external_node_modules = ["firebase-admin"]
+    external_node_modules = ["firebase-admin", "jsonwebtoken", "bcryptjs"]
     included_files = ["node_modules/**"]
 
 # API Routes
