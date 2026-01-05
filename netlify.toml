@@ -1,6 +1,7 @@
 [build]
   command = "npm install && cd frontend && npm install && npm run build"
   publish = "frontend/build"
+  functions = "backend/netlify/functions"
 
 [dev]
   # Run the React app on port 3000
@@ -19,17 +20,22 @@
 [functions]
   node_bundler = "esbuild"
   external_node_modules = [
-    "firebase-admin", 
-    "graphql-scalars", 
-    "lodash", 
+    "firebase-admin",
+    "graphql-scalars",
+    "lodash",
     "graphql-type-json",
-    "@graphql-tools/schema"
+    "@graphql-tools/schema",
+    "jsonwebtoken",
+    "bcryptjs"
   ]
   included_files = [
     "node_modules/graphql-type-json/**",
     "node_modules/@graphql-tools/**",
     "node_modules/graphql/**"
   ]
+
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
 
 # Configure secrets scanning
 [build.processing]
