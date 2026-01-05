@@ -1,7 +1,6 @@
-const { gql } = require('graphql-tag');
+const gql = require('graphql-tag');
 const { DateTimeResolver } = require('graphql-scalars');
 const { GraphQLJSON } = require('graphql-type-json');
-const { merge } = require('lodash');
 const fs = require('fs');
 const path = require('path');
 
@@ -61,13 +60,14 @@ const typeDefs = [
   contactTypeDefs
 ];
 
-// Merge all resolvers
-const resolvers = merge(
-  { DateTime: DateTimeResolver, JSON: GraphQLJSON },
-  appointmentResolvers,
-  userResolvers,
-  authResolvers,
-  contactResolvers
-);
+// Merge all resolvers without lodash
+const resolvers = {
+  DateTime: DateTimeResolver,
+  JSON: GraphQLJSON,
+  ...appointmentResolvers,
+  ...userResolvers,
+  ...authResolvers,
+  ...contactResolvers,
+};
 
 module.exports = { typeDefs, resolvers };

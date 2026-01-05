@@ -168,11 +168,10 @@ function initializeFirebase() {
   }
 
   if (isDevelopment && process.env.USE_MOCK_FIREBASE !== 'false') {
+    dbInstance = mockFirebase.db;
+    authInstance = mockFirebase.auth;
     firebaseInitialized = true;
-    return {
-      db: mockFirebase.db,
-      auth: mockFirebase.auth
-    };
+    return { db: dbInstance, auth: authInstance };
   }
 
   const missing = FIREBASE_CONFIG.requiredVars.filter(v => !process.env[v]);
@@ -244,24 +243,27 @@ async function verifyToken(token) {
    EXPORTS
 ===================================================== */
 
-module.exports = {
-  initialize: () => {
-    const { db, auth } = initializeFirebase();
-    return { db, auth, verifyToken };
-  },
-
+const firebase = {
+  initialize: initializeFirebase,
   verifyToken,
-
+  
   get db() {
-    if (!dbInstance) initializeFirebase();
-    return dbInstance || mockFirebase.db;
+    if (!dbInstance) throw new Error('Firebase not initialized. Call initialize() first.');
+    return dbInstance;
   },
-
+  
   get auth() {
-    if (!authInstance) initializeFirebase();
-    return authInstance || mockFirebase.auth;
+    if (!authInstance) throw new Error('Firebase not initialized. Call initialize() first.');
+    return authInstance;
+  },
+  
+  get admin() {
+    if (!firebaseInitialized) throw new Error('Firebase not initialized. Call initialize() first.');
+    return admin;
   },
 
   FirebaseInitializationError,
   FirebaseAuthError
 };
+
+module.exports = firebase;

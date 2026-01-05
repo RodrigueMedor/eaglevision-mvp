@@ -1,8 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-const { db } = require('../firebase');
+const firebase = require('../firebase');
 const { logAudit } = require('../utils/audit');
+
+// Get db instance when needed
+const getDb = () => {
+  try {
+    return firebase.db;
+  } catch (error) {
+    console.error('Firebase not initialized:', error.message);
+    throw new Error('Database service is not available. Please try again later.');
+  }
+};
 
 // Initialize the email transporter
 let transporter;
@@ -28,27 +38,33 @@ const checkEmailConfigured = (req, res, next) => {
 router.post('/send-verification-email', checkEmailConfigured, async (req, res) => {
   try {
     const { email } = req.body;
+    const db = getDb();
 
     // Validate email
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: 'Valid email is required' });
     }
 
-    // Generate a verification token
+    // Check if user exists
+    const userSnapshot = await db.collection('users').where('email', '==', email).limit(1).get();
+    
+    if (userSnapshot.empty) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = userSnapshot.docs[0].data();
+    const userId = userSnapshot.docs[0].id;
+
+    // Generate verification token
     const verificationToken = uuidv4();
-    const tokenExpires = new Date();
-    tokenExpires.setHours(tokenExpires.getHours() + 24); // 24 hours expiration
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24); // 24 hours expiration
 
-    // Save the token to Firestore
-    const verificationDoc = {
-      email,
-      token: verificationToken,
-      expires: tokenExpires,
-      used: false,
-      createdAt: new Date().toISOString()
-    };
-
-    await db.collection('emailVerifications').add(verificationDoc);
+    // Save verification token to user document
+    await db.collection('users').doc(userId).update({
+      emailVerificationToken: verificationToken,
+      emailVerificationExpires: expiresAt.toISOString()
+    });
 
     // Send verification email
     const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}&email=${encodeURIComponent(email)}`;
@@ -94,7 +110,7 @@ router.post('/send-verification-email', checkEmailConfigured, async (req, res) =
     // Log the audit
     await logAudit({
       action: 'VERIFICATION_EMAIL_SENT',
-      userId: null,
+      userId: userId,
       userEmail: email,
       metadata: { email, token: verificationToken }
     });
@@ -108,6 +124,114 @@ router.post('/send-verification-email', checkEmailConfigured, async (req, res) =
     console.error('Error in send-verification-email:', error);
     return res.status(500).json({ 
       error: error.message || 'Failed to send verification email' 
+    });
+  }
+});
+
+/**
+ * @route POST /api/verify-email
+ * @desc Verify the user's email using the verification token
+ * @access Public
+ */
+router.post('/verify-email', async (req, res) => {
+  try {
+    const { token, email } = req.body;
+    
+    if (!token || !email) {
+      return res.status(400).json({ 
+        error: 'Token and email are required' 
+      });
+    }
+
+    const db = getDb();
+
+    // Find user with matching verification token and email
+    const usersSnapshot = await db.collection('users')
+      .where('emailVerificationToken', '==', token)
+      .where('email', '==', email)
+      .where('emailVerificationExpires', '>', new Date().toISOString())
+      .limit(1)
+      .get();
+
+    if (usersSnapshot.empty) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Invalid, expired, or already used verification link' 
+      });
+    }
+
+    const userDoc = usersSnapshot.docs[0];
+    const userId = userDoc.id;
+    const userData = userDoc.data();
+
+    // Check if already verified
+    if (userData.isEmailVerified) {
+      return res.status(200).json({
+        success: true,
+        message: 'Email already verified',
+        alreadyVerified: true
+      });
+    }
+
+    // Update user as verified
+    await db.collection('users').doc(userId).update({
+      isEmailVerified: true,
+      emailVerifiedAt: new Date().toISOString(),
+      emailVerificationToken: null,
+      emailVerificationExpires: null,
+      updatedAt: new Date().toISOString()
+    });
+
+    // Log the action
+    try {
+      await logAudit({
+        action: 'EMAIL_VERIFIED',
+        userId: userId,
+        userEmail: email,
+        metadata: { 
+          verifiedAt: new Date().toISOString(),
+          method: 'email' 
+        }
+      });
+    } catch (auditError) {
+      console.error('Error logging email verification:', auditError);
+      // Continue even if audit logging fails
+    }
+
+    // Send welcome email
+    if (transporter) {
+      try {
+        await transporter.sendMail({
+          from: `"Eagle Vision Edge" <${process.env.EMAIL_FROM || 'noreply@eaglevisionedge.com'}>`,
+          to: email,
+          subject: 'Welcome to Eagle Vision Edge - Email Verified',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2>Welcome to Eagle Vision Edge!</h2>
+              <p>Your email has been successfully verified. Thank you for joining our community!</p>
+              <p>You can now log in to your account and start using our services.</p>
+              <p>If you have any questions, feel free to contact our support team.</p>
+              <br>
+              <p>Best regards,<br>The Eagle Vision Edge Team</p>
+            </div>
+          `
+        });
+      } catch (emailError) {
+        console.error('Error sending welcome email:', emailError);
+        // Continue even if welcome email fails
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Email verified successfully',
+      userId: userId
+    });
+  } catch (error) {
+    console.error('Error verifying email:', error);
+    return res.status(500).json({ 
+      success: false,
+      error: error.message || 'Failed to verify email. Please try again.' 
     });
   }
 });

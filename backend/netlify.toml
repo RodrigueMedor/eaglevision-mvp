@@ -12,20 +12,20 @@
   port = 8888
   autoLaunch = true
 
-# Add Netlify Functions plugin
+# Install function dependencies
 [[plugins]]
-  package = "@netlify/plugin-functions-install-core"
+  package = "@netlify/plugin-functions"
 
 [functions]
   node_bundler = "esbuild"
   external_node_modules = ["firebase-admin"]
-  node_bundler = "esbuild"
   included_files = ["node_modules/**"]
   
   [functions.graphql]
     node_bundler = "esbuild"
     timeout = 30  # seconds
     node_version = "18"
+    external_node_modules = ["firebase-admin"]
     included_files = ["node_modules/**"]
 
 # API Routes
