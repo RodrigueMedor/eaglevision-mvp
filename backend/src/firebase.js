@@ -26,6 +26,44 @@ let firebaseInitialized = false;
 let dbInstance = null;
 let authInstance = null;
 
+function resolvePrivateKey() {
+  let key = process.env.FIREBASE_PRIVATE_KEY || '';
+
+  // Prefer explicit base64 variable if provided
+  if (process.env.FIREBASE_PRIVATE_KEY_BASE64) {
+    try {
+      const decoded = Buffer.from(process.env.FIREBASE_PRIVATE_KEY_BASE64, 'base64').toString('utf8');
+      if (decoded.includes('-----BEGIN PRIVATE KEY-----')) {
+        return decoded;
+      }
+    } catch (_) {}
+  }
+
+  if (!key) return key;
+
+  // Strip accidental wrapping quotes
+  if ((key.startsWith('"') && key.endsWith('"')) || (key.startsWith("'") && key.endsWith("'"))) {
+    key = key.slice(1, -1);
+  }
+
+  // Convert escaped newlines
+  if (key.includes('\\n')) {
+    key = key.replace(/\\n/g, '\n');
+  }
+
+  // If it looks like base64 (no BEGIN header and long single-line), try decode
+  if (!key.includes('-----BEGIN') && /^[A-Za-z0-9+/=\s]+$/.test(key)) {
+    try {
+      const decoded = Buffer.from(key, 'base64').toString('utf8');
+      if (decoded.includes('-----BEGIN PRIVATE KEY-----')) {
+        return decoded;
+      }
+    } catch (_) {}
+  }
+
+  return key;
+}
+
 /* =====================================================
    ERROR CLASSES
 ===================================================== */
@@ -188,7 +226,7 @@ function initializeFirebase() {
         credential: admin.credential.cert({
           project_id: process.env.FIREBASE_PROJECT_ID,
           client_email: process.env.FIREBASE_CLIENT_EMAIL,
-          private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
+          private_key: resolvePrivateKey()
         }),
         ...FIREBASE_CONFIG.options
       });
