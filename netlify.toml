@@ -18,13 +18,13 @@
 # Functions configuration
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["firebase-admin", "graphql-scalars", "lodash", "graphql-type-json"]
-  included_files = ["node_modules/graphql-type-json/**", "node_modules/@graphql-tools/**"]
-  node_bundler = "esbuild"
-  
-[functions.graphql]
-  node_bundler = "esbuild"
-  external_node_modules = ["firebase-admin", "graphql-scalars", "lodash", "graphql-type-json"]
+  external_node_modules = [
+    "firebase-admin", 
+    "graphql-scalars", 
+    "lodash", 
+    "graphql-type-json",
+    "@graphql-tools/schema"
+  ]
   included_files = [
     "node_modules/graphql-type-json/**",
     "node_modules/@graphql-tools/**",
