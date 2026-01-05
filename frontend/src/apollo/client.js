@@ -3,11 +3,10 @@ import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 
 // HTTP connection to the API
-const isDevelopment = process.env.APP_ENV === 'development';
-const graphqlUri = process.env.REACT_APP_GRAPHQL_URI || 
-  (process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:4000/graphql'  // Local development
-    : 'https://eaglevisionedge.com/.netlify/functions/graphql');  // Production
+const isProduction = process.env.NODE_ENV === 'production';
+const graphqlUri = isProduction 
+  ? 'https://eaglevisionedge.com/.netlify/functions/graphql'  // Always use production URL in production
+  : process.env.REACT_APP_GRAPHQL_URI || 'http://localhost:4000/graphql';  // Use custom URL or default to localhost
 
 const httpLink = createHttpLink({
   uri: graphqlUri,
