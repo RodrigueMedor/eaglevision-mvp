@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 const { db } = require('../firebase');
-const { sendSSOEmail } = require('../services/email');
 const { logAudit } = require('../utils/audit');
 
 /**
@@ -69,8 +68,6 @@ router.post('/send-verification-email', async (req, res) => {
 
     // Send email
     await new Promise((resolve, reject) => {
-      // Send the email using the existing transporter from email service
-      require('../services/email').transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
           console.error('Error sending verification email:', error);
           return reject(new Error('Failed to send verification email'));

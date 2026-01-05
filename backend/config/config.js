@@ -1,29 +1,26 @@
-// Load environment variables with dotenv in development
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
+// Load environment variables with dotenv
+require('dotenv').config({ path: '.env.local' });
 
-// Validate required environment variables
+// Application environment
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Validate required environment variables in production
 const requiredEnvVars = [
-  'NODE_ENV',
   'SESSION_SECRET',
-  'JWT_SECRET',
-  'EMAIL_FROM',
-  'SENDGRID_API_KEY'
+  'JWT_SECRET'
 ];
 
-// Only validate in production to allow for development defaults
-if (process.env.NODE_ENV === 'production') {
+if (isProduction) {
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
   if (missingVars.length > 0) {
     throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
   }
 }
 
+// Default configuration
 module.exports = {
   app: {
-    // In production, we don't want any defaults for security
-    nodeEnv: process.env.NODE_ENV || 'development',
+    environment: isProduction ? 'production' : 'development',
     frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
     apiUrl: process.env.API_URL || 'http://localhost:4000',
     cookieDomain: process.env.COOKIE_DOMAIN || 'localhost',

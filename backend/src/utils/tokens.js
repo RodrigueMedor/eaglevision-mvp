@@ -1,6 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
 const { db } = require('../firebase');
-const emailConfig = require('../config/email');
 
 /**
  * Generate a verification token and save it to the database

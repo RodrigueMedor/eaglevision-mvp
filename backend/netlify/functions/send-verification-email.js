@@ -1,4 +1,3 @@
-const nodemailer = require('nodemailer');
 const { createTransport } = nodemailer;
 const jwt = require('jsonwebtoken');
 

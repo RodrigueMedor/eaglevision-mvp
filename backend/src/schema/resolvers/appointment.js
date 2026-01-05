@@ -1,7 +1,6 @@
 const { AuthenticationError, UserInputError } = require('../../errors');
 const { Timestamp, FieldValue } = require('firebase-admin/firestore');
 const { v4: uuidv4 } = require('uuid');
-const { sendSSOEmail } = require('../../services/email');
 const { logAudit } = require('../../utils/audit');
 
 const appointmentResolvers = {

@@ -7,7 +7,6 @@ const http = require('http');
 const cors = require('cors');
 const { typeDefs, resolvers } = require('./schema/index');
 const { initializeFirebase } = require('./firebase');
-const emailRoutes = require('./routes/email');
 
 // Initialize Firebase (optional)
 const { db, admin, verifyToken } = initializeFirebase();

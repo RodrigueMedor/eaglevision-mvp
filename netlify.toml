@@ -41,7 +41,6 @@
     "**/README.md",
     "**/*.pyc"
   ]
-  skip_keys = ["NODE_ENV", "EMAIL_FROM"]
 
 # Environment variables for build
 [context.production.environment]
