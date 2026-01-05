@@ -7,9 +7,6 @@ const cors = require('cors');
 const { typeDefs, resolvers } = require('../../backend/src/schema');
 const firebase = require('../../backend/src/firebase');
 
-// Initialize Firebase
-firebase.initialize();
-
 // Create express app
 const app = express();
 
@@ -31,6 +28,14 @@ const server = new ApolloServer({
 
 // Apply middleware
 const startServer = async () => {
+  // Initialize Firebase within a try/catch so missing envs don't crash module load
+  try {
+    firebase.initialize();
+  } catch (e) {
+    console.error('Failed to initialize Firebase:', e);
+    throw e;
+  }
+
   await server.start();
   
   // Apply Apollo Server middleware to Express app
@@ -49,7 +54,7 @@ const startServer = async () => {
         return { 
           req,
           user: req.user || null, // User will be null if not authenticated
-          db: require('firebase-admin').firestore(),
+          db: firebase.db,
         };
       },
     })
@@ -89,7 +94,18 @@ startServer()
   })
   .catch((error) => {
     console.error('Failed to start server:', error);
-    process.exit(1);
+    // Provide a graceful degraded handler instead of exiting
+    handler = async () => ({
+      statusCode: 503,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+      body: JSON.stringify({
+        error: 'Service Unavailable',
+        message: 'Server failed to start',
+      }),
+    });
   });
 
 // Netlify function handler
