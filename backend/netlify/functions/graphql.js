@@ -236,10 +236,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Export the handler for Netlify Functions
-let handler;
-
-const handlerFunction = async (event, context) => {
+// Export the handler for Netlify Functions using serverless-http
+module.exports.handler = async (event, context) => {
   try {
     console.log('Received event:', JSON.stringify(event, null, 2));
     
@@ -259,12 +257,9 @@ const handlerFunction = async (event, context) => {
     // Wait for the server to be ready
     await initialization;
     
-    // Handle the request
-    const response = await server.createHandler({
-      expressApp: app,
-      path: '/.netlify/functions/graphql',
-      cors: false, // We're handling CORS in the Express app
-    })(event, context);
+    // Handle the request via serverless-http
+    const sls = serverless(app);
+    const response = await sls(event, context);
 
     console.log('Response status:', response.statusCode);
     return response;
@@ -284,9 +279,6 @@ const handlerFunction = async (event, context) => {
     };
   }
 };
-
-// Export the handler for Netlify Functions
-module.exports.handler = (event, context) => handlerFunction(event, context);
 
 // For local development
 if (process.env.APP_ENV !== 'production') {
