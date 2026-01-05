@@ -3,3 +3,36 @@
 .cache/
 node_modules/.cache/
 frontend/node_modules/.cache/
+
+# Netlify
+.netlify/functions/*.zip
+.netlify/functions/*.zip.*
+.netlify/netlify.toml
+
+# Environment files
+# Global
+.env
+.env.local
+.env.development
+.env.production
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Frontend specific
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Backend specific
+backend/.env
+backend/.env.local
+backend/.env.development
+backend/.env.production
+backend/.env.development.local
+backend/.env.test.local
+backend/.env.production.local
