@@ -96,6 +96,45 @@ router.get('/test', (req, res) => {
   res.status(200).json({ message: 'Test endpoint is working' });
 });
 
+router.post('/auth/signup', express.json(), async (req, res) => {
+  try {
+    const { email, password, displayName } = req.body || {};
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'email and password are required' });
+    }
+
+    const auth = firebase.auth;
+    const userRecord = await auth.createUser({
+      email,
+      password,
+      displayName: displayName || undefined,
+      emailVerified: false,
+      disabled: false
+    });
+
+    const claims = { role: 'user' };
+    try {
+      await firebase.admin.auth().setCustomUserClaims(userRecord.uid, claims);
+    } catch (e) {}
+
+    let customToken = null;
+    try {
+      customToken = await firebase.admin.auth().createCustomToken(userRecord.uid, claims);
+    } catch (e) {}
+
+    return res.status(201).json({
+      uid: userRecord.uid,
+      email: userRecord.email,
+      displayName: userRecord.displayName || null,
+      customToken
+    });
+  } catch (err) {
+    const status = err.code === 'auth/email-already-exists' ? 409 : 400;
+    return res.status(status).json({ error: err.message || 'Signup failed' });
+  }
+});
+
 // Mount the router at the base path
 app.use('/.netlify/functions/graphql', router);
 
