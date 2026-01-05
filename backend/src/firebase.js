@@ -4,10 +4,16 @@ let firebaseInitialized = false;
 let dbInstance = null;
 let adminInstance = null;
 
+// Check if we're in development mode
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
 // Mock verify token function for development
 const mockVerifyToken = async (token) => {
-  console.warn('WARNING: Running in development mode with mock authentication');
-  return { uid: 'dev-user-id', email: 'dev@example.com' };
+  if (isDevelopment) {
+    console.warn('WARNING: Running in development mode with mock authentication');
+    return { uid: 'dev-user-id', email: 'dev@example.com' };
+  }
+  throw new Error('Authentication required');
 };
 
 // In-memory store for development
@@ -20,14 +26,15 @@ const mockDataStore = {
 const mockFirebase = {
   db: {
     collection: (collectionName) => {
-      if (collectionName === 'users') {
-        return {
-          where: (field, op, value) => ({
-            limit: (count) => ({
-              get: async () => {
-                const users = Array.from(mockDataStore.users.values())
-                  .filter(user => user[field] === value)
-                  .slice(0, count);
+      if (isDevelopment) {
+        if (collectionName === 'users') {
+          return {
+            where: (field, op, value) => ({
+              limit: (count) => ({
+                get: async () => {
+                  const users = Array.from(mockDataStore.users.values())
+                    .filter(user => user[field] === value)
+                    .slice(0, count);
                 return {
                   empty: users.length === 0,
                   docs: users.map(user => ({

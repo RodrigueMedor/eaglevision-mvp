@@ -9,17 +9,33 @@
   targetPort = 4000
   target = "http://localhost:4000"
   publish = "build"
+  port = 8888
+  autoLaunch = true
 
 [functions]
-  # Node.js version for Netlify Functions
   node_bundler = "esbuild"
-  external_node_modules = ["firebase-admin", "jsonwebtoken", "nodemailer", "graphql-type-json", "@graphql-tools/schema"]
-  included_files = ["node_modules/graphql-type-json/**", "node_modules/@graphql-tools/**", "node_modules/graphql/**"]
+  external_node_modules = [
+    "firebase-admin", 
+    "jsonwebtoken", 
+    "nodemailer", 
+    "graphql-type-json", 
+    "@graphql-tools/schema",
+    "@apollo/server",
+    "graphql"
+  ]
   
-  # Increase function timeout to 30 seconds
+  included_files = [
+    "node_modules/graphql-type-json/**", 
+    "node_modules/@graphql-tools/**", 
+    "node_modules/graphql/**",
+    "node_modules/@apollo/**",
+    "src/**/*.js"
+  ]
+  
   [functions.graphql]
     node_bundler = "esbuild"
     timeout = 30  # seconds
+    node_version = "18"  # Use Node.js 18 LTS
 
 # API Routes
 [[redirects]]

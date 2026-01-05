@@ -1,4 +1,5 @@
 const { ApolloServer } = require('@apollo/server');
+const { ApolloServerPluginLandingPageLocalDefault, ApolloServerPluginLandingPageProductionDefault } = require('@apollo/server/plugin/landingPage/default');
 
 console.log('Initializing GraphQL server...');
 const { expressMiddleware } = require('@apollo/server/express4');
@@ -8,8 +9,19 @@ const cors = require('cors');
 const { typeDefs, resolvers } = require('../../src/schema');
 const { initializeFirebase } = require('../../src/firebase');
 
+// Add request tracking for debugging
+let requestCount = 0;
+
 // Initialize Firebase
-const firebase = initializeFirebase();
+let firebase;
+try {
+  console.log('Initializing Firebase...');
+  firebase = initializeFirebase();
+  console.log('Firebase initialized successfully');
+} catch (error) {
+  console.error('Failed to initialize Firebase:', error);
+  throw error; // Fail fast if Firebase initialization fails
+}
 const { db, admin, verifyToken } = firebase;
 
 // Create Express app and router
@@ -121,33 +133,62 @@ const server = new ApolloServer({
 });
 
 const initializeApp = async () => {
-  await server.start();
-  
-  // Apply middleware to the router
-  router.use(express.json());
-  
-  // Apply GraphQL middleware with CORS
-  router.use(
-    '/',
-    cors(corsOptions),
-    expressMiddleware(server, {
-      context: async ({ req }) => {
-        const token = req.headers.authorization?.split(' ')[1];
-        let user = null;
-        
-        if (token) {
-          try {
-            const decodedToken = await verifyToken(token);
-            user = { uid: decodedToken.uid, email: decodedToken.email };
-          } catch (error) {
-            console.error('Error verifying token:', error);
-          }
-        }
-        
-        return { user, db, admin };
+  try {
+    console.log('Starting Apollo Server...');
+    await server.start();
+    console.log('Apollo Server started successfully');
+    
+    // Apply middleware to the router
+    router.use(express.json());
+    
+    // Request logging middleware
+    router.use((req, res, next) => {
+      const requestId = ++requestCount;
+      const start = Date.now();
+      console.log(`[${new Date().toISOString()}] [Request ${requestId}] ${req.method} ${req.path}`);
+      
+      res.on('finish', () => {
+        console.log(`[${new Date().toISOString()}] [Request ${requestId}] Completed in ${Date.now() - start}ms with status ${res.statusCode}`);
+      });
+      
+      next();
+    });
+    
+    // Apply GraphQL middleware with CORS
+    router.use(
+      '/',
+      cors(corsOptions),
+      (req, res, next) => {
+        console.log('Handling GraphQL request');
+        next();
       },
-    })
-  );
+      expressMiddleware(server, {
+        context: async ({ req }) => {
+          const token = req.headers.authorization?.split(' ')[1];
+          let user = null;
+          
+          if (token) {
+            try {
+              console.log('Verifying token...');
+              const decodedToken = await verifyToken(token);
+              user = { uid: decodedToken.uid, email: decodedToken.email };
+              console.log('User authenticated:', user.email);
+            } catch (error) {
+              console.error('Error verifying token:', error);
+              // Don't throw here, just proceed with user as null
+            }
+          } else {
+            console.log('No authentication token provided');
+          }
+          
+          return { user, db, admin };
+        },
+      })
+    );
+  } catch (error) {
+    console.error('Error in initializeApp:', error);
+    throw error; // Re-throw to be caught by the outer catch
+  }
   
   // Mount the router to the app
   app.use(router);
@@ -159,9 +200,15 @@ const initializeApp = async () => {
 };
 
 // Initialize the app immediately
+console.log('Starting application initialization...');
 const initialization = initializeApp().catch(err => {
-  console.error('Failed to initialize app:', err);
+  console.error('FATAL: Failed to initialize app:', err);
   process.exit(1);
+});
+
+// Log when initialization is complete
+initialization.then(() => {
+  console.log('Application initialization completed successfully');
 });
 
 // Handle all other routes
@@ -171,10 +218,20 @@ app.all('*', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
+  const errorId = Math.random().toString(36).substr(2, 9);
+  console.error(`[${new Date().toISOString()}] [Error ${errorId}] Unhandled error:`, err);
+  
+  // Log the full error for debugging
+  if (err.stack) {
+    console.error(`[${new Date().toISOString()}] [Error ${errorId}] Stack:`, err.stack);
+  }
+  
   res.status(500).json({
     error: 'Internal Server Error',
-    message: process.env.APP_ENV === 'production' ? 'Something went wrong' : err.message
+    message: process.env.APP_ENV === 'production' 
+      ? `An unexpected error occurred. Error ID: ${errorId}` 
+      : err.message,
+    errorId: errorId
   });
 });
 
