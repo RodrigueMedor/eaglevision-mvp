@@ -4,12 +4,28 @@ const { v4: uuidv4 } = require('uuid');
 const { db } = require('../firebase');
 const { logAudit } = require('../utils/audit');
 
+// Initialize the email transporter
+let transporter;
+require('../config/email')
+  .then(t => { transporter = t; })
+  .catch(err => console.error('Failed to initialize email transporter:', err));
+
+// Middleware to check if email is configured
+const checkEmailConfigured = (req, res, next) => {
+  if (!transporter) {
+    return res.status(503).json({ 
+      error: 'Email service is not available. Please try again later.' 
+    });
+  }
+  next();
+};
+
 /**
  * @route POST /api/send-verification-email
  * @desc Send a verification email to the user
  * @access Public
  */
-router.post('/send-verification-email', async (req, res) => {
+router.post('/send-verification-email', checkEmailConfigured, async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -66,16 +82,14 @@ router.post('/send-verification-email', async (req, res) => {
       `
     };
 
-    // Send email
-    await new Promise((resolve, reject) => {
-        if (error) {
-          console.error('Error sending verification email:', error);
-          return reject(new Error('Failed to send verification email'));
-        }
-        console.log('Verification email sent:', info.messageId);
-        resolve(info);
-      });
-    });
+    // Send email using the transport
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Verification email sent:', info.messageId);
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      throw new Error('Failed to send verification email');
+    }
 
     // Log the audit
     await logAudit({

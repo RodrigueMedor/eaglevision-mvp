@@ -31,6 +31,7 @@
     "graphql-tag": "^2.12.6",
     "graphql-type-json": "^0.3.2",
     "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^7.0.12",
     "serverless-http": "^4.0.0"
   },
   "devDependencies": {

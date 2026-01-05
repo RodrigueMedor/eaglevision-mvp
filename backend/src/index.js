@@ -3,6 +3,7 @@ const { ApolloServer } = require('@apollo/server');
 const { expressMiddleware } = require('@apollo/server/express4');
 const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer');
 const express = require('express');
+const emailRoutes = require('./routes/email');
 const http = require('http');
 const cors = require('cors');
 const { typeDefs, resolvers } = require('./schema/index');
