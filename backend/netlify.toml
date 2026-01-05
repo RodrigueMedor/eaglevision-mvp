@@ -2,7 +2,6 @@
   command = "npm install && npm run build"
   publish = "build"
   functions = "netlify/functions"
-  command = "npm run build"
 
 [dev]
   framework = "#custom"
@@ -12,7 +11,8 @@
 [functions]
   # Node.js version for Netlify Functions
   node_bundler = "esbuild"
-  external_node_modules = ["firebase-admin", "jsonwebtoken", "nodemailer"]
+  external_node_modules = ["firebase-admin", "jsonwebtoken", "nodemailer", "graphql-type-json", "@graphql-tools/schema"]
+  included_files = ["node_modules/graphql-type-json/**", "node_modules/@graphql-tools/**", "node_modules/graphql/**"]
 
 # API Routes
 [[redirects]]
