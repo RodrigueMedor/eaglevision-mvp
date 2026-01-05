@@ -1,13 +1,15 @@
 import { ApolloClient, InMemoryCache, createHttpLink, ApolloLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
+import { RetryLink } from '@apollo/client/link/retry';
 
 // HTTP connection to the API
 const isProduction = process.env.NODE_ENV === 'production';
 const graphqlUri = isProduction 
-  ? 'https://eaglevisionedge.com/.netlify/functions/graphql'  // Always use production URL in production
-  : process.env.REACT_APP_GRAPHQL_URI || 'http://localhost:4000/graphql';  // Use custom URL or default to localhost
+  ? 'https://eaglevisionedge.com/.netlify/functions/graphql'
+  : process.env.REACT_APP_GRAPHQL_URI || 'http://localhost:4000/graphql';
 
+// Create HTTP link
 const httpLink = createHttpLink({
   uri: graphqlUri,
   credentials: 'include',
@@ -19,15 +21,41 @@ const httpLink = createHttpLink({
   },
 });
 
+// Retry logic for failed requests
+const retryLink = new RetryLink({
+  delay: {
+    initial: 300,
+    max: Infinity,
+    jitter: true,
+  },
+  attempts: {
+    max: 5,
+    retryIf: (error) => {
+      // Only retry on network errors or 5xx responses
+      return !error || !error.statusCode || error.statusCode >= 500;
+    },
+  },
+});
+
 // Error handling
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors)
-    graphQLErrors.forEach(({ message, locations, path }) =>
+const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message, locations, path }) => {
       console.error(
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-      )
-    );
-  if (networkError) console.error(`[Network error]: ${networkError}`);
+      );
+    });
+  }
+  
+  if (networkError) {
+    console.error(`[Network error]: ${networkError}`);
+    
+    // If we get a 401, the user might need to re-authenticate
+    if (networkError.statusCode === 401) {
+      // Handle unauthorized error (e.g., redirect to login)
+      console.log('Unauthorized - redirecting to login');
+    }
+  }
 });
 
 // Authentication middleware

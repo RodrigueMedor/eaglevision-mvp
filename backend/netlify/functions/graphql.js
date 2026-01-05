@@ -1,4 +1,6 @@
 const { ApolloServer } = require('@apollo/server');
+
+console.log('Initializing GraphQL server...');
 const { expressMiddleware } = require('@apollo/server/express4');
 const express = require('express');
 const serverless = require('serverless-http');
@@ -177,11 +179,54 @@ app.use((err, req, res, next) => {
 });
 
 // Export the handler for Netlify Functions
-module.exports.handler = async (event, context) => {
-  // Wait for initialization to complete
-  await initialization;
-  return handler(event, context);
+const handler = async (event, context) => {
+  try {
+    console.log('Received event:', JSON.stringify(event, null, 2));
+    
+    // Handle preflight requests
+    if (event.httpMethod === 'OPTIONS') {
+      return {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        },
+        body: '',
+      };
+    }
+
+    // Wait for the server to be ready
+    await initialization;
+    
+    // Handle the request
+    const response = await server.createHandler({
+      expressApp: app,
+      path: '/.netlify/functions/graphql',
+      cors: false, // We're handling CORS in the Express app
+    })(event, context);
+
+    console.log('Response status:', response.statusCode);
+    return response;
+  } catch (error) {
+    console.error('Error in GraphQL handler:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        error: 'Internal Server Error',
+        message: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    };
+  }
 };
+
+// Export the handler for Netlify Functions
+module.exports.handler = handler;
 
 // For local development
 if (process.env.APP_ENV !== 'production') {

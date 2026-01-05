@@ -6,13 +6,20 @@
 [dev]
   framework = "#custom"
   command = "npm run start"
-  targetPort = 8888
+  targetPort = 4000
+  target = "http://localhost:4000"
+  publish = "build"
 
 [functions]
   # Node.js version for Netlify Functions
   node_bundler = "esbuild"
   external_node_modules = ["firebase-admin", "jsonwebtoken", "nodemailer", "graphql-type-json", "@graphql-tools/schema"]
   included_files = ["node_modules/graphql-type-json/**", "node_modules/@graphql-tools/**", "node_modules/graphql/**"]
+  
+  # Increase function timeout to 30 seconds
+  [functions.graphql]
+    node_bundler = "esbuild"
+    timeout = 30  # seconds
 
 # API Routes
 [[redirects]]
