@@ -7,7 +7,7 @@ const express = require('express');
 const serverless = require('serverless-http');
 const cors = require('cors');
 const { typeDefs, resolvers } = require('../../src/schema');
-const { initializeFirebase } = require('../../src/firebase');
+const firebaseService = require('../../src/firebase');
 
 // Add request tracking for debugging
 let requestCount = 0;
@@ -16,13 +16,14 @@ let requestCount = 0;
 let firebase;
 try {
   console.log('Initializing Firebase...');
-  firebase = initializeFirebase();
+  firebaseService.initialize();
+  firebase = firebaseService;
   console.log('Firebase initialized successfully');
 } catch (error) {
   console.error('Failed to initialize Firebase:', error);
   throw error; // Fail fast if Firebase initialization fails
 }
-const { db, admin, verifyToken } = firebase;
+// Access via getters after initialization
 
 // Create Express app and router
 const app = express();
@@ -170,7 +171,7 @@ const initializeApp = async () => {
           if (token) {
             try {
               console.log('Verifying token...');
-              const decodedToken = await verifyToken(token);
+              const decodedToken = await firebase.verifyToken(token);
               user = { uid: decodedToken.uid, email: decodedToken.email };
               console.log('User authenticated:', user.email);
             } catch (error) {
@@ -181,7 +182,7 @@ const initializeApp = async () => {
             console.log('No authentication token provided');
           }
           
-          return { user, db, admin };
+          return { user, db: firebase.db, admin: firebase.admin };
         },
       })
     );
@@ -236,7 +237,9 @@ app.use((err, req, res, next) => {
 });
 
 // Export the handler for Netlify Functions
-const handler = async (event, context) => {
+let handler;
+
+const handlerFunction = async (event, context) => {
   try {
     console.log('Received event:', JSON.stringify(event, null, 2));
     
@@ -283,7 +286,7 @@ const handler = async (event, context) => {
 };
 
 // Export the handler for Netlify Functions
-module.exports.handler = handler;
+module.exports.handler = (event, context) => handlerFunction(event, context);
 
 // For local development
 if (process.env.APP_ENV !== 'production') {
