@@ -23,7 +23,7 @@ export const auth = getAuth(app);
 // Initialize Firestore with settings
 export const db = (() => {
   const dbInstance = getFirestore(app);
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.APP_ENV === 'development') {
     // Enable Firestore logging in development
     console.log('[Firebase] Initializing Firestore in development mode');
   }
@@ -34,7 +34,7 @@ export const storage = getStorage(app);
 
 // Initialize Analytics only in production
 let analytics;
-if (process.env.NODE_ENV === 'production' && typeof window !== 'undefined') {
+if (process.env.APP_ENV === 'production' && typeof window !== 'undefined') {
   try {
     analytics = getAnalytics(app);
   } catch (error) {

@@ -139,7 +139,7 @@ async function startApolloServer() {
     console.error('Error:', err);
     res.status(500).json({ 
       error: 'Internal Server Error',
-      message: process.env.NODE_ENV === 'development' ? err.message : undefined
+      message: process.env.APP_ENV === 'development' ? err.message : undefined
     });
   });
 

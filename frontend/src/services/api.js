@@ -31,7 +31,7 @@ api.interceptors.request.use(
     }
     
     // Log request in development
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.APP_ENV === 'development') {
       console.log(`[API] ${config.method?.toUpperCase() || 'GET'} ${config.url}`, {
         headers: config.headers,
         data: config.data,
@@ -51,7 +51,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => {
     // Log successful response in development
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.APP_ENV === 'development') {
       console.log(`[API] ${response.config.method?.toUpperCase() || 'GET'} ${response.config.url} - ${response.status}`, {
         data: response.data,
         headers: response.headers,

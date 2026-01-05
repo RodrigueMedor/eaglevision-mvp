@@ -6,7 +6,7 @@ global:
   buildCaching: true
   region: oregon
   envVars:
-    - key: NODE_ENV
+    - key: APP_ENV
       value: production
     - key: PYTHONUNBUFFERED
       value: "1"
