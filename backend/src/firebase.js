@@ -1,321 +1,267 @@
-const admin = require('firebase-admin');
+'use strict';
 
+const admin = require('firebase-admin');
+const { getFirestore } = require('firebase-admin/firestore');
+
+/* =====================================================
+   ENV + CONFIG
+===================================================== */
+
+const FIREBASE_CONFIG = {
+  requiredVars: [
+    'FIREBASE_PROJECT_ID',
+    'FIREBASE_CLIENT_EMAIL',
+    'FIREBASE_PRIVATE_KEY'
+  ],
+  options: {
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    storageBucket:
+        process.env.FIREBASE_STORAGE_BUCKET ||
+        `${process.env.FIREBASE_PROJECT_ID}.appspot.com`
+  }
+};
+
+const isDevelopment = process.env.NODE_ENV !== 'production';
 let firebaseInitialized = false;
 let dbInstance = null;
-let adminInstance = null;
+let authInstance = null;
 
-// Check if we're in development mode
-const isDevelopment = process.env.NODE_ENV !== 'production';
+/* =====================================================
+   ERROR CLASSES
+===================================================== */
 
-// Mock verify token function for development
-const mockVerifyToken = async (token) => {
-  if (isDevelopment) {
-    console.warn('WARNING: Running in development mode with mock authentication');
-    return { uid: 'dev-user-id', email: 'dev@example.com' };
+class FirebaseInitializationError extends Error {
+  constructor(message) {
+    super(`Firebase Initialization Error: ${message}`);
+    this.name = 'FirebaseInitializationError';
   }
-  throw new Error('Authentication required');
-};
+}
 
-// In-memory store for development
-const mockDataStore = {
-  users: new Map(),
-  refreshTokens: new Map()
-};
+class FirebaseAuthError extends Error {
+  constructor(message, code = 'auth/error') {
+    super(message);
+    this.name = 'FirebaseAuthError';
+    this.code = code;
+  }
+}
 
-// Mock Firebase functions for development
+/* =====================================================
+   MOCK IMPLEMENTATION (DEV ONLY)
+===================================================== */
+
+const mockDataStore = {};
+
+const mockVerifyToken = async () => ({
+  uid: 'dev-user',
+  email: 'dev@example.com',
+  email_verified: true,
+  role: 'admin'
+});
+
 const mockFirebase = {
   db: {
     collection: (collectionName) => {
-      if (isDevelopment) {
-        if (collectionName === 'users') {
-          return {
-            where: (field, op, value) => ({
-              limit: (count) => ({
-                get: async () => {
-                  const users = Array.from(mockDataStore.users.values())
-                    .filter(user => user[field] === value)
-                    .slice(0, count);
-                return {
-                  empty: users.length === 0,
-                  docs: users.map(user => ({
-                    id: user.id,
-                    data: () => user,
-                    exists: true
-                  }))
-                };
-              }
-            })
-          }),
-          add: async (data) => {
-            const id = `user_${Date.now()}`;
-            const userData = { ...data, id };
-            mockDataStore.users.set(id, userData);
-            return { id };
-          },
-          doc: (id) => ({
-            get: async () => {
-              const user = mockDataStore.users.get(id);
-              return {
-                exists: !!user,
-                data: () => user,
-                id: user?.id
-              };
-            },
-            delete: async () => {
-              mockDataStore.users.delete(id);
-              return true;
-            },
-            set: async (data) => {
-              mockDataStore.users.set(id, { ...data, id });
-              return true;
-            }
-          })
-        };
-      } else if (collectionName === 'refreshTokens') {
-        return {
-          doc: (token) => ({
-            set: async (data) => {
-              mockDataStore.refreshTokens.set(token, data);
-              return true;
-            },
-            get: async () => ({
-              exists: mockDataStore.refreshTokens.has(token),
-              data: () => mockDataStore.refreshTokens.get(token)
-            }),
-            delete: async () => {
-              mockDataStore.refreshTokens.delete(token);
-              return true;
-            }
-          })
-        };
+      if (!mockDataStore[collectionName]) {
+        mockDataStore[collectionName] = new Map();
       }
-      
-      // Default collection handler
-      const collection = {
-        where: (field, operator, value) => {
-          return {
-            orderBy: (orderField, direction = 'asc') => {
-              return {
-                get: async () => {
-                  let items = Array.from((mockDataStore[collectionName] || new Map()).values());
-                  
-                  // Apply filter if where was called
-                  if (field && operator && value !== undefined) {
-                    items = items.filter(item => {
-                      const itemValue = item[field];
-                      switch (operator) {
-                        case '==': return itemValue === value;
-                        case '>=': return itemValue >= value;
-                        case '<=': return itemValue <= value;
-                        case '>': return itemValue > value;
-                        case '<': return itemValue < value;
-                        case '!=': return itemValue !== value;
-                        case 'array-contains': 
-                          return Array.isArray(itemValue) && itemValue.includes(value);
-                        default: return true;
-                      }
-                    });
-                  }
-                  
-                  // Apply sorting if orderBy was called
-                  if (orderField) {
-                    items.sort((a, b) => {
-                      const aVal = a[orderField];
-                      const bVal = b[orderField];
-                      if (aVal === bVal) return 0;
-                      if (aVal === undefined) return 1;
-                      if (bVal === undefined) return -1;
-                      if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-                      if (aVal > bVal) return direction === 'asc' ? 1 : -1;
-                      return 0;
-                    });
-                  }
-                  
-                  return {
-                    empty: items.length === 0,
-                    docs: items.map(item => ({
-                      id: item.id,
-                      data: () => item,
-                      exists: true
-                    }))
-                  };
-                }
-              };
-            },
-            get: async () => {
-              let items = Array.from((mockDataStore[collectionName] || new Map()).values());
-              
-              // Apply filter if where was called
-              if (field && operator && value !== undefined) {
-                items = items.filter(item => {
-                  const itemValue = item[field];
-                  switch (operator) {
-                    case '==': return itemValue === value;
-                    case '>=': return itemValue >= value;
-                    case '<=': return itemValue <= value;
-                    case '>': return itemValue > value;
-                    case '<': return itemValue < value;
-                    case '!=': return itemValue !== value;
-                    case 'array-contains': 
-                      return Array.isArray(itemValue) && itemValue.includes(value);
-                    default: return true;
-                  }
-                });
-              }
-              
-              return {
-                empty: items.length === 0,
-                docs: items.map(item => ({
-                  id: item.id,
-                  data: () => item,
-                  exists: true
-                }))
-              };
-            }
-          };
-        },
-        orderBy: (field, direction = 'asc') => {
-          return {
-            get: async () => {
-              let items = Array.from((mockDataStore[collectionName] || new Map()).values());
-              
-              // Apply sorting
-              items.sort((a, b) => {
-                const aVal = a[field];
-                const bVal = b[field];
-                if (aVal === bVal) return 0;
-                if (aVal === undefined) return 1;
-                if (bVal === undefined) return -1;
-                if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-                if (aVal > bVal) return direction === 'asc' ? 1 : -1;
-                return 0;
-              });
-              
-              return {
-                empty: items.length === 0,
-                docs: items.map(item => ({
-                  id: item.id,
-                  data: () => item,
-                  exists: true
-                }))
-              };
-            }
-          };
-        },
-        limit: (count) => ({
+
+      return {
+        where: (field, op, value) => ({
           get: async () => {
-            let items = Array.from((mockDataStore[collectionName] || new Map()).values());
-            
-            if (count) {
-              items = items.slice(0, count);
-            }
-            
+            const items = Array.from(mockDataStore[collectionName].values())
+                .filter(item => item[field] === value);
+
             return {
               empty: items.length === 0,
-              docs: items.map(item => ({
-                id: item.id,
-                data: () => item,
+              docs: items.map(i => ({
+                id: i.id,
+                data: () => i,
                 exists: true
               }))
             };
           }
         }),
-        get: async () => {
-          const items = Array.from((mockDataStore[collectionName] || new Map()).values());
-          return {
-            empty: items.length === 0,
-            docs: items.map(item => ({
-              id: item.id,
-              data: () => item,
-              exists: true
-            }))
-          };
-        },
+
+        orderBy: (field, direction = 'asc') => ({
+          get: async () => {
+            const items = Array.from(mockDataStore[collectionName].values())
+                .sort((a, b) =>
+                    direction === 'asc'
+                        ? a[field] > b[field] ? 1 : -1
+                        : a[field] < b[field] ? 1 : -1
+                );
+
+            return {
+              empty: items.length === 0,
+              docs: items.map(i => ({
+                id: i.id,
+                data: () => i,
+                exists: true
+              }))
+            };
+          }
+        }),
+
+        limit: (count) => ({
+          get: async () => {
+            const items = Array.from(mockDataStore[collectionName].values())
+                .slice(0, count);
+
+            return {
+              empty: items.length === 0,
+              docs: items.map(i => ({
+                id: i.id,
+                data: () => i,
+                exists: true
+              }))
+            };
+          }
+        }),
+
+        get: async () => ({
+          empty: mockDataStore[collectionName].size === 0,
+          docs: Array.from(mockDataStore[collectionName].values()).map(i => ({
+            id: i.id,
+            data: () => i,
+            exists: true
+          }))
+        }),
+
         add: async (data) => {
           const id = `doc_${Date.now()}`;
-          if (!mockDataStore[collectionName]) {
-            mockDataStore[collectionName] = new Map();
-          }
-          const docData = { ...data, id };
-          mockDataStore[collectionName].set(id, docData);
-          return { id, data: () => docData };
+          mockDataStore[collectionName].set(id, { ...data, id });
+          return { id };
         },
+
         doc: (id) => ({
           get: async () => ({
-            exists: mockDataStore[collectionName]?.has(id),
-            data: () => mockDataStore[collectionName]?.get(id)
-          })
+            exists: mockDataStore[collectionName].has(id),
+            data: () => mockDataStore[collectionName].get(id),
+            id
+          }),
+          set: async (data) => {
+            mockDataStore[collectionName].set(id, { ...data, id });
+          },
+          delete: async () => {
+            mockDataStore[collectionName].delete(id);
+          }
         })
       };
     }
   },
-  admin: {
-    auth: () => ({
-      verifyIdToken: mockVerifyToken
-    })
+
+  auth: {
+    verifyIdToken: mockVerifyToken
   }
 };
 
+/* =====================================================
+   INITIALIZATION
+===================================================== */
+
 function initializeFirebase() {
-  // If already initialized, return the instances
   if (firebaseInitialized) {
     return {
       db: dbInstance || mockFirebase.db,
-      admin: adminInstance || mockFirebase.admin,
-      verifyToken: verifyTokenFunction
+      auth: authInstance || mockFirebase.auth
     };
   }
 
+  if (isDevelopment && process.env.USE_MOCK_FIREBASE !== 'false') {
+    firebaseInitialized = true;
+    return {
+      db: mockFirebase.db,
+      auth: mockFirebase.auth
+    };
+  }
+
+  const missing = FIREBASE_CONFIG.requiredVars.filter(v => !process.env[v]);
+  if (missing.length) {
+    throw new FirebaseInitializationError(
+        `Missing env vars: ${missing.join(', ')}`
+    );
+  }
+
   try {
-    // Check if Firebase is configured
-    const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
-    
-    if (!serviceAccount) {
-      console.warn('WARNING: FIREBASE_SERVICE_ACCOUNT not set. Using mock Firebase for development.');
-      firebaseInitialized = true;
-      return {
-        db: mockFirebase.db,
-        admin: mockFirebase.admin,
-        verifyToken: mockVerifyToken
-      };
+    if (!admin.apps.length) {
+      admin.initializeApp({
+        credential: admin.credential.cert({
+          project_id: process.env.FIREBASE_PROJECT_ID,
+          client_email: process.env.FIREBASE_CLIENT_EMAIL,
+          private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
+        }),
+        ...FIREBASE_CONFIG.options
+      });
     }
 
-    // If we get here, Firebase is configured but there's an error with the credentials
-    console.warn('WARNING: Using mock Firebase due to configuration issues');
+    dbInstance = getFirestore();
+    authInstance = admin.auth();
     firebaseInitialized = true;
-    return {
-      db: mockFirebase.db,
-      admin: mockFirebase.admin,
-      verifyToken: mockVerifyToken
-    };
 
-  } catch (error) {
-    console.warn('WARNING: Using mock Firebase due to initialization error:', error.message);
-    firebaseInitialized = true;
-    return {
-      db: mockFirebase.db,
-      admin: mockFirebase.admin,
-      verifyToken: mockVerifyToken
-    };
+    return { db: dbInstance, auth: authInstance };
+  } catch (err) {
+    if (isDevelopment) {
+      return {
+        db: mockFirebase.db,
+        auth: mockFirebase.auth
+      };
+    }
+    throw new FirebaseInitializationError(err.message);
   }
 }
 
-// This will be used when Firebase is properly initialized
-async function verifyTokenFunction(token) {
-  if (!adminInstance) {
-    return mockVerifyToken(token);
+/* =====================================================
+   TOKEN VERIFICATION
+===================================================== */
+
+async function verifyToken(token) {
+  if (!token) {
+    throw new FirebaseAuthError('No token provided', 'auth/no-token');
   }
+
+  if (!authInstance) {
+    initializeFirebase();
+  }
+
   try {
-    const decodedToken = await adminInstance.auth().verifyIdToken(token);
+    const decoded = await authInstance.verifyIdToken(token, true);
     return {
-      uid: decodedToken.uid,
-      email: decodedToken.email,
-      email_verified: decodedToken.email_verified,
+      uid: decoded.uid,
+      email: decoded.email,
+      email_verified: decoded.email_verified || false,
+      role: decoded.role || 'user',
+      claims: decoded
     };
-  } catch (error) {
-    console.error('Error verifying token:', error);
-    return null;
+  } catch (err) {
+    throw new FirebaseAuthError(
+        'Invalid or expired token',
+        err.code || 'auth/invalid-token'
+    );
   }
 }
 
-module.exports = { initializeFirebase };
+/* =====================================================
+   EXPORTS
+===================================================== */
+
+module.exports = {
+  initialize: () => {
+    const { db, auth } = initializeFirebase();
+    return { db, auth, verifyToken };
+  },
+
+  verifyToken,
+
+  get db() {
+    if (!dbInstance) initializeFirebase();
+    return dbInstance || mockFirebase.db;
+  },
+
+  get auth() {
+    if (!authInstance) initializeFirebase();
+    return authInstance || mockFirebase.auth;
+  },
+
+  FirebaseInitializationError,
+  FirebaseAuthError
+};

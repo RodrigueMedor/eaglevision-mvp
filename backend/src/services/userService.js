@@ -1,4 +1,4 @@
-const { firebaseAdmin } = require('../config/firebase');
+const { firebaseAdmin } = require('../firebase');
 const { hashPassword, generateToken } = require('../utils/auth');
 
 /**
