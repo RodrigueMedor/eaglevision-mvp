@@ -5,10 +5,10 @@ const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/dra
 const serverless = require('serverless-http');
 const cors = require('cors');
 const { typeDefs, resolvers } = require('../../backend/src/schema');
-const { initializeFirebase } = require('../../backend/src/firebase');
+const firebase = require('../../backend/src/firebase');
 
 // Initialize Firebase
-initializeFirebase();
+firebase.initialize();
 
 // Create express app
 const app = express();

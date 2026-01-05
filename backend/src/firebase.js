@@ -167,7 +167,8 @@ function initializeFirebase() {
     };
   }
 
-  if (isDevelopment && process.env.USE_MOCK_FIREBASE !== 'false') {
+  // Allow forcing mock in any environment via USE_MOCK_FIREBASE=true
+  if (process.env.USE_MOCK_FIREBASE === 'true' || (isDevelopment && process.env.USE_MOCK_FIREBASE !== 'false')) {
     dbInstance = mockFirebase.db;
     authInstance = mockFirebase.auth;
     firebaseInitialized = true;

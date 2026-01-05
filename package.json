@@ -3,6 +3,7 @@
     "@apollo/server": "^4.12.2",
     "apollo-server-express": "^3.13.0",
     "apollo-server-lambda": "^3.13.0",
+    "firebase-admin": "^11.11.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^2.2.1",
     "cors": "^2.8.5",
