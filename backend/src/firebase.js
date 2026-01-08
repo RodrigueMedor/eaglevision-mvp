@@ -10,8 +10,7 @@ const { getFirestore } = require('firebase-admin/firestore');
 const FIREBASE_CONFIG = {
   requiredVars: [
     'FIREBASE_PROJECT_ID',
-    'FIREBASE_CLIENT_EMAIL',
-    'FIREBASE_PRIVATE_KEY'
+    'FIREBASE_CLIENT_EMAIL'
   ],
   options: {
     projectId: process.env.FIREBASE_PROJECT_ID,
@@ -27,41 +26,16 @@ let dbInstance = null;
 let authInstance = null;
 
 function resolvePrivateKey() {
-  let key = process.env.FIREBASE_PRIVATE_KEY || '';
-
-  // Prefer explicit base64 variable if provided
-  if (process.env.FIREBASE_PRIVATE_KEY_BASE64) {
-    try {
-      const decoded = Buffer.from(process.env.FIREBASE_PRIVATE_KEY_BASE64, 'base64').toString('utf8');
-      if (decoded.includes('-----BEGIN PRIVATE KEY-----')) {
-        return decoded;
-      }
-    } catch (_) {}
-  }
-
-  if (!key) return key;
-
-  // Strip accidental wrapping quotes
-  if ((key.startsWith('"') && key.endsWith('"')) || (key.startsWith("'") && key.endsWith("'"))) {
-    key = key.slice(1, -1);
-  }
-
-  // Convert escaped newlines
-  if (key.includes('\\n')) {
-    key = key.replace(/\\n/g, '\n');
-  }
-
-  // If it looks like base64 (no BEGIN header and long single-line), try decode
-  if (!key.includes('-----BEGIN') && /^[A-Za-z0-9+/=\s]+$/.test(key)) {
-    try {
-      const decoded = Buffer.from(key, 'base64').toString('utf8');
-      if (decoded.includes('-----BEGIN PRIVATE KEY-----')) {
-        return decoded;
-      }
-    } catch (_) {}
-  }
-
-  return key;
+  // Only accept the base64-encoded PEM via FIREBASE_PRIVATE_KEY_BASE64
+  const b64 = process.env.FIREBASE_PRIVATE_KEY_BASE64 || '';
+  if (!b64) return '';
+  try {
+    const decoded = Buffer.from(b64, 'base64').toString('utf8');
+    if (decoded.includes('-----BEGIN PRIVATE KEY-----') && decoded.includes('-----END PRIVATE KEY-----')) {
+      return decoded;
+    }
+  } catch (_) {}
+  return '';
 }
 
 /* =====================================================
@@ -240,11 +214,15 @@ function initializeFirebase() {
     if (!admin.apps.length) {
       const usingBase64 = Boolean(process.env.FIREBASE_PRIVATE_KEY_BASE64);
       const resolvedKey = resolvePrivateKey();
-      const keyLooksPem = resolvedKey && resolvedKey.includes('-----BEGIN') && resolvedKey.includes('PRIVATE KEY-----');
+      const keyLooksPem = resolvedKey && resolvedKey.includes('-----BEGIN PRIVATE KEY-----') && resolvedKey.includes('-----END PRIVATE KEY-----');
       const keyLen = resolvedKey ? resolvedKey.length : 0;
       try {
-        console.log('[Firebase] Initializing Admin. Key source:', usingBase64 ? 'BASE64' : 'PLAINTEXT', 'Key present:', Boolean(resolvedKey), 'Looks like PEM:', keyLooksPem, 'Len:', keyLen);
+        console.log('[Firebase] Initializing Admin. Key source:', 'BASE64', 'Key present:', Boolean(resolvedKey), 'Looks like PEM:', keyLooksPem, 'Len:', keyLen);
       } catch (_) {}
+
+      if (!keyLooksPem) {
+        throw new FirebaseInitializationError('Invalid private key format. Ensure FIREBASE_PRIVATE_KEY_BASE64 is a base64-encoded PEM that begins with "-----BEGIN PRIVATE KEY-----" and ends with "-----END PRIVATE KEY-----".');
+      }
 
       admin.initializeApp({
         credential: admin.credential.cert({
