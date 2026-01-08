@@ -46,6 +46,8 @@ const LOGIN_MUTATION = gql`
 const SIGNUP_MUTATION = gql`
   mutation Signup($input: SignUpInput!) {
     signup(input: $input) {
+      success
+      message
       token
       refreshToken
       user {
@@ -54,47 +56,85 @@ const SIGNUP_MUTATION = gql`
         firstName
         lastName
         role
+        emailVerified
+        phone
+        createdAt
+        updatedAt
       }
     }
   }
 `;
 
 const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
-  const [login, { loading: loginLoading }] = useMutation(LOGIN_MUTATION, {
+  const [login] = useMutation(LOGIN_MUTATION, {
     onCompleted: (data) => {
-      if (data?.login?.token) {
-        localStorage.setItem('token', data.login.token);
+      console.log('Login response:', data);
+      const token = data?.login?.token;
+      if (token) {
+        localStorage.setItem('token', token);
         if (data.login.refreshToken) {
           localStorage.setItem('refreshToken', data.login.refreshToken);
         }
-        localStorage.setItem('refreshToken', data.login.refreshToken);
-        if (onSuccess) onSuccess(data.login.user);
+        if (onSuccess) onSuccess(data.login.user || { email });
         handleClose();
+      } else {
+        setError('Login failed. Please try again.');
       }
     },
     onError: (error) => {
       console.error('Login error:', error);
-      setError(error.message || 'Failed to sign in. Please try again.');
+      setError(error.message || 'Failed to sign in. Please check your credentials and try again.');
     }
   });
 
-  const [signup, { loading: signupLoading }] = useMutation(SIGNUP_MUTATION, {
+  const [signup] = useMutation(SIGNUP_MUTATION, {
     onCompleted: (data) => {
-      console.log('Signup completed:', data);
-      if (data?.signup?.token) {
-        localStorage.setItem('token', data.signup.token);
-        if (data.signup.refreshToken) {
+      console.log('Signup response (onCompleted):', data);
+      
+      if (!data || !data.signup) {
+        console.error('Unexpected response format from server:', data);
+        setError('Received an unexpected response from the server. Please try again.');
+        return;
+      }
+      
+      if (data.signup.success) {
+        // If we have tokens, handle login automatically
+        if (data.signup.token && data.signup.refreshToken) {
+          // Store tokens
+          localStorage.setItem('token', data.signup.token);
           localStorage.setItem('refreshToken', data.signup.refreshToken);
+          
+          // Call onSuccess with user data
+          if (onSuccess) {
+            onSuccess(data.signup.user);
+          }
+          
+          // Close the modal
+          handleClose();
+        } else {
+          // Fallback to old behavior if tokens aren't available
+          console.log('Signup successful, but no tokens received. Please sign in manually.');
+          setSuccessMessage('Account created successfully! Please sign in.');
+          setActiveTab(0);
         }
-        if (onSuccess) onSuccess(data.signup.user);
+        
+        // Clear the form
+        setEmail('');
+        setPassword('');
+        setFirstName('');
+        setLastName('');
+        setConfirmPassword('');
+        setError('');
       } else {
-        console.error('No token in signup response:', data);
-        setError('Failed to complete signup. Please try again.');
+        console.error('Server returned unsuccessful signup:', data.signup);
+        const errorMessage = data.signup.message || 'Failed to complete signup. Please try again.';
+        setError(errorMessage);
+        setSuccessMessage('');
       }
     },
     onError: (error) => {
       // Log the full error for debugging
-      console.error('SIGNUP ERROR DETAILS:', {
+      console.error('Signup error details:', {
         message: error.message,
         graphQLErrors: error.graphQLErrors,
         networkError: error.networkError,
@@ -102,10 +142,9 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
         stack: error.stack
       });
       
-      // Default error message
+      // Handle GraphQL errors
       let errorMessage = 'Failed to sign up. Please try again.';
       
-      // Handle GraphQL errors
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
         const graphQLError = error.graphQLErrors[0];
         
@@ -167,6 +206,7 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [verificationSent, setVerificationSent] = useState(false);
 
   useEffect(() => {
@@ -248,15 +288,28 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
       return;
     }
 
-    if (!email || !password || !firstName || !lastName) {
-      setError('Please fill in all required fields');
+    const requiredFields = { email, password, firstName, lastName };
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => !value)
+      .map(([key]) => key);
+      
+    if (missingFields.length > 0) {
+      setError(`Missing required fields: ${missingFields.join(', ')}`);
       return;
     }
 
     setIsSubmitting(true);
     setError('');
+    setSuccessMessage('');
     
     try {
+      console.log('Attempting signup with:', {
+        email: email.toLowerCase().trim(),
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        password: '••••••' // Don't log actual password
+      });
+
       const result = await signup({
         variables: {
           input: {
@@ -265,26 +318,35 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
             firstName: firstName.trim(),
             lastName: lastName.trim()
           }
-        }
+        },
+        // Skip caching to avoid issues with the response
+        fetchPolicy: 'no-cache'
       });
-      
-      console.log('Signup result:', result);
-      
-      // If we get here, the mutation completed but we might still have an error
-      if (result.errors) {
-        console.error('Mutation completed with errors:', result.errors);
-        setError(result.errors[0]?.message || 'Signup failed. Please try again.');
-      } else if (!result.data?.signup) {
-        console.error('No signup data in response:', result);
-        setError('Failed to complete signup. Please try again.');
+
+      console.log('Signup response:', result);
+
+      // Handle the response based on the server's structure
+      if (result.data?.signup?.success) {
+        const successMsg = result.data.signup.message || 'Account created successfully! Please sign in.';
+        console.log('Signup successful:', successMsg);
+        
+        setSuccessMessage(successMsg);
+        setActiveTab(0); // Switch to sign in tab
+        
+        // Clear the form
+        setEmail('');
+        setPassword('');
+        setFirstName('');
+        setLastName('');
+        setConfirmPassword('');
+      } else {
+        const errorMsg = result.data?.signup?.message || 'Failed to complete signup. Please try again.';
+        console.error('Signup failed:', errorMsg);
+        setError(errorMsg);
       }
     } catch (err) {
-      console.error('Signup error in handleSignUp:', err);
-      // The error should be handled by the mutation's onError callback,
-      // but we'll set a fallback error just in case
-      if (!error) {
-        setError('An unexpected error occurred. Please try again.');
-      }
+      console.error('Signup error:', err);
+      setError(err.message || 'An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -334,6 +396,7 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
     setLastName('');
     setConfirmPassword('');
     setError('');
+    setSuccessMessage('');
     setVerificationSent(false);
     setActiveTab(0);
     onClose();
@@ -396,8 +459,13 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
         </Button>
       </Box>
       {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
           {error}
+        </Alert>
+      )}
+      {successMessage && (
+        <Alert severity="success" sx={{ mb: 2 }}>
+          {successMessage}
         </Alert>
       )}
       <Button
@@ -499,8 +567,13 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
         }}
       />
       {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
           {error}
+        </Alert>
+      )}
+      {successMessage && (
+        <Alert severity="success" sx={{ mb: 2 }}>
+          {successMessage}
         </Alert>
       )}
       <Button

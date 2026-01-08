@@ -3,8 +3,12 @@ import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { RetryLink } from '@apollo/client/link/retry';
 
-// HTTP connection to the API - Always use production URL
-const graphqlUri = 'https://eaglevisionedge.com/.netlify/functions/graphql';
+// HTTP connection to the API - Use localhost during development; use relative path in production
+const graphqlUri =
+  process.env.REACT_APP_API_URL ||
+  (process.env.NODE_ENV === 'development'
+    ? 'http://localhost:4000/graphql'
+    : '/graphql');
 
 // Create HTTP link
 const httpLink = createHttpLink({
@@ -68,7 +72,7 @@ const authLink = setContext((_, { headers }) => {
 
 // Create the Apollo Client instance
 const client = new ApolloClient({
-  link: ApolloLink.from([errorLink, authLink, httpLink]),
+  link: ApolloLink.from([errorLink, authLink, retryLink, httpLink]),
   cache: new InMemoryCache(),
   defaultOptions: {
     watchQuery: {

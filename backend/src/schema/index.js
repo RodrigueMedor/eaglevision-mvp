@@ -16,8 +16,6 @@ const userResolvers = require('./resolvers/user');
 const { authResolvers } = require('./resolvers/auth');
 const contactResolvers = require('./resolvers/contact');
 
-console.log('Auth resolvers:', Object.keys(authResolvers)); // Debug log
-
 // Base type definitions
 const baseTypeDefs = gql`
   scalar DateTime
@@ -44,8 +42,8 @@ const baseTypeDefs = gql`
     _empty: String
   }
   
-  # Common response types
-  type SuccessResponse {
+  # Common response interface
+  interface SuccessResponse {
     success: Boolean!
     message: String
   }
@@ -60,14 +58,27 @@ const typeDefs = [
   contactTypeDefs
 ];
 
-// Merge all resolvers without lodash
+// Merge all resolvers, ensuring Query and Mutation maps are deep-merged
 const resolvers = {
   DateTime: DateTimeResolver,
   JSON: GraphQLJSON,
+  // Spread type-specific resolvers first (may include Appointment, etc.)
   ...appointmentResolvers,
   ...userResolvers,
   ...authResolvers,
   ...contactResolvers,
+  // Override with deep-merged root fields so nothing gets overwritten
+  Query: {
+    ...(appointmentResolvers.Query || {}),
+    ...(userResolvers.Query || {}),
+    ...(contactResolvers.Query || {}),
+  },
+  Mutation: {
+    ...(appointmentResolvers.Mutation || {}),
+    ...(userResolvers.Mutation || {}),
+    ...(authResolvers.Mutation || {}),
+    ...(contactResolvers.Mutation || {}),
+  },
 };
 
 module.exports = { typeDefs, resolvers };

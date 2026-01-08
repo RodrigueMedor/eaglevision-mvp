@@ -104,21 +104,37 @@ const mockFirebase = {
       }
 
       return {
-        where: (field, op, value) => ({
-          get: async () => {
-            const items = Array.from(mockDataStore[collectionName].values())
-                .filter(item => item[field] === value);
+        where: (field, op, value) => {
+          const filtered = Array.from(mockDataStore[collectionName].values())
+              .filter(item => item[field] === value);
 
-            return {
-              empty: items.length === 0,
-              docs: items.map(i => ({
-                id: i.id,
-                data: () => i,
-                exists: true
-              }))
-            };
-          }
-        }),
+          return {
+            limit: (count) => ({
+              get: async () => {
+                const items = filtered.slice(0, count);
+                return {
+                  empty: items.length === 0,
+                  docs: items.map(i => ({
+                    id: i.id,
+                    data: () => i,
+                    exists: true
+                  }))
+                };
+              }
+            }),
+            get: async () => {
+              const items = filtered;
+              return {
+                empty: items.length === 0,
+                docs: items.map(i => ({
+                  id: i.id,
+                  data: () => i,
+                  exists: true
+                }))
+              };
+            }
+          };
+        },
 
         orderBy: (field, direction = 'asc') => ({
           get: async () => {
@@ -222,11 +238,19 @@ function initializeFirebase() {
 
   try {
     if (!admin.apps.length) {
+      const usingBase64 = Boolean(process.env.FIREBASE_PRIVATE_KEY_BASE64);
+      const resolvedKey = resolvePrivateKey();
+      const keyLooksPem = resolvedKey && resolvedKey.includes('-----BEGIN') && resolvedKey.includes('PRIVATE KEY-----');
+      const keyLen = resolvedKey ? resolvedKey.length : 0;
+      try {
+        console.log('[Firebase] Initializing Admin. Key source:', usingBase64 ? 'BASE64' : 'PLAINTEXT', 'Key present:', Boolean(resolvedKey), 'Looks like PEM:', keyLooksPem, 'Len:', keyLen);
+      } catch (_) {}
+
       admin.initializeApp({
         credential: admin.credential.cert({
           project_id: process.env.FIREBASE_PROJECT_ID,
           client_email: process.env.FIREBASE_CLIENT_EMAIL,
-          private_key: resolvePrivateKey()
+          private_key: resolvedKey
         }),
         ...FIREBASE_CONFIG.options
       });

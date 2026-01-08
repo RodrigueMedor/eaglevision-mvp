@@ -7,6 +7,14 @@ const typeDefs = gql`
     user: User!
   }
 
+  type SignUpResponse implements SuccessResponse {
+    success: Boolean!
+    message: String
+    token: String
+    refreshToken: String
+    user: User
+  }
+
   input LoginInput {
     email: String!
     password: String!
@@ -22,7 +30,7 @@ const typeDefs = gql`
 
   extend type Mutation {
     login(input: LoginInput!): AuthPayload!
-    signup(input: SignUpInput!): AuthPayload!
+    signup(input: SignUpInput!): SignUpResponse
     refreshToken(refreshToken: String!): AuthPayload!
     logout: Boolean!
   }

@@ -6,12 +6,18 @@ const { logAudit } = require('../../utils/audit');
 const appointmentResolvers = {
   Query: {
     async appointments(_, __, { db }) {
-      const snapshot = await db
+      try {
+        const snapshot = await db
           .collection('appointments')
           .orderBy('appointmentDate', 'desc')
           .get();
 
-      return snapshot.docs.map(doc => normalizeAppointment(doc));
+        return snapshot.docs.map(doc => normalizeAppointment(doc));
+      } catch (err) {
+        console.error('Error fetching appointments list:', err);
+        // Non-nullable list: return empty array on error
+        return [];
+      }
     },
 
     async userAppointments(_, { userId }, { db, user }) {

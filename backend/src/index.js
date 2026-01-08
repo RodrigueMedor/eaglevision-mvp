@@ -91,12 +91,16 @@ async function startApolloServer() {
         } : null
       });
 
-      // Return a user-friendly error message
-      if (error.extensions?.code === 'INTERNAL_SERVER_ERROR') {
-        return new Error('Internal server error');
-      }
-
-      return error;
+      // Preserve message and extensions for client-side handling in development
+      return {
+        message: error.message || 'Internal server error',
+        locations: error.locations,
+        path: error.path,
+        extensions: {
+          code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
+          ...error.extensions,
+        },
+      };
     },
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
@@ -130,11 +134,14 @@ async function startApolloServer() {
       json(),
       expressMiddleware(server, {
         context: async ({ req }) => {
-          const token = req.headers.authorization?.split(' ')[1];
+          const authHeader = req.headers.authorization || '';
+          const bearer = authHeader.startsWith('Bearer ')
+            ? authHeader.split(' ')[1]
+            : authHeader;
           let user = null;
-          if (token) {
+          if (bearer) {
             try {
-              const info = await firebase.verifyToken(token);
+              const info = await firebase.verifyToken(bearer);
               user = { id: info.uid, email: info.email };
             } catch (e) {
               console.error('Token verification error:', e);
@@ -142,6 +149,9 @@ async function startApolloServer() {
           }
           return {
             user,
+            token: authHeader, // some resolvers expect raw token in context
+            db: firebase.db,
+            admin: firebase.admin,
             firebase: {
               db: firebase.db,
               auth: firebase.auth,
