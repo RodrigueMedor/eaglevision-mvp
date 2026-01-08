@@ -6,7 +6,7 @@ const { expressMiddleware } = require('@apollo/server/express4');
 const express = require('express');
 const serverless = require('serverless-http');
 const cors = require('cors');
-const { typeDefs, resolvers } = require('../../src/schema');
+const { schema } = require('../../src/schema');
 const firebaseService = require('../../src/firebase');
 
 // Add request tracking for debugging
@@ -140,8 +140,7 @@ app.use('/.netlify/functions/graphql', router);
 
 // Create Apollo Server with CORS support
 const server = new ApolloServer({
-  typeDefs,
-  resolvers,
+  schema,
   introspection: true,
   formatError: (error) => {
     console.error('GraphQL Error:', error);
