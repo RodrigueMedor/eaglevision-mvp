@@ -1,6 +1,7 @@
 const gql = require('graphql-tag');
 const { DateTimeResolver } = require('graphql-scalars');
 const { GraphQLJSON } = require('graphql-type-json');
+const { makeExecutableSchema } = require('@graphql-tools/schema');
 const fs = require('fs');
 const path = require('path');
 
@@ -82,3 +83,9 @@ const resolvers = {
 };
 
 module.exports = { typeDefs, resolvers };
+
+// Also export a constructed executable schema to avoid version mismatches
+// in environments where multiple copies of the `graphql` package may exist.
+const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+module.exports.schema = schema;
