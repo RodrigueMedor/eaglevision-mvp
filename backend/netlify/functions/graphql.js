@@ -6,11 +6,13 @@ const { expressMiddleware } = require('@apollo/server/express4');
 const express = require('express');
 const serverless = require('serverless-http');
 const cors = require('cors');
-const { schema } = require('../../src/schema');
+const { typeDefs, resolvers } = require('../../src/schema');
+const { makeExecutableSchema } = require('@graphql-tools/schema');
 const graphqlPkg = require('graphql/package.json');
 const { isSchema } = require('graphql');
 console.log('GraphQL runtime version:', graphqlPkg.version, 'resolved at:', require.resolve('graphql'));
-console.log('Executable schema provided isSchema(schema):', isSchema(schema));
+const schema = makeExecutableSchema({ typeDefs, resolvers });
+console.log('Constructed executable schema isSchema(schema):', isSchema(schema));
 const firebaseService = require('../../src/firebase');
 
 // Add request tracking for debugging

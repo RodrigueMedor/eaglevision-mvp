@@ -20,11 +20,8 @@
 [functions]
   node_bundler = "esbuild"
   external_node_modules = [
+    # Keep heavy libs external if desired; bundle all GraphQL-related libs to avoid version mismatch
     "firebase-admin",
-    "graphql-scalars",
-    "lodash",
-    "graphql-type-json",
-    "@graphql-tools/schema",
     "jsonwebtoken",
     "bcryptjs"
   ]
