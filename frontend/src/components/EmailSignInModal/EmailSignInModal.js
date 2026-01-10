@@ -53,13 +53,8 @@ const SIGNUP_MUTATION = gql`
       user {
         id
         email
-        emailVerified
         firstName
         lastName
-        phone
-        role
-        createdAt
-        updatedAt
       }
     }
   }
