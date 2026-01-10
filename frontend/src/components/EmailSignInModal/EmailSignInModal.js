@@ -93,35 +93,25 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
     onCompleted: (data) => {
       console.log('Signup response (onCompleted):', data);
       
-      if (!data || !data.signup) {
+      if (!data || !data.signUp) {
         console.error('Unexpected response format from server:', data);
         setError('Received an unexpected response from the server. Please try again.');
         return;
       }
       
-      if (data.signup.success) {
-        // If we have tokens, handle login automatically
-        if (data.signup.token && data.signup.refreshToken) {
-          // Store tokens
-          localStorage.setItem('token', data.signup.token);
-          localStorage.setItem('refreshToken', data.signup.refreshToken);
-          
-          // Call onSuccess with user data
-          if (onSuccess) {
-            onSuccess(data.signup.user);
+      if (data.signUp.success) {
+        // Handle successful signup
+        const token = data.signUp.token;
+        if (token) {
+          localStorage.setItem('token', token);
+          if (data.signUp.refreshToken) {
+            localStorage.setItem('refreshToken', data.signUp.refreshToken);
           }
-          
-          // Close the modal
+          if (onSuccess) onSuccess(data.signUp.user || { email });
           handleClose();
         } else {
-          // Fallback to old behavior if tokens aren't available
-          console.log('Signup successful, but no tokens received. Please sign in manually.');
-          setSuccessMessage('Account created successfully! Please sign in.');
-          setActiveTab(0);
+          setError('Signup successful but no token received. Please try logging in.');
         }
-        
-        // Clear the form
-        setEmail('');
         setPassword('');
         setFirstName('');
         setLastName('');
