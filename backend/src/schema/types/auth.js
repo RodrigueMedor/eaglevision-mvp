@@ -30,7 +30,7 @@ const typeDefs = gql`
 
   extend type Mutation {
     login(input: LoginInput!): AuthPayload!
-    signup(input: SignUpInput!): SignUpResponse
+    signUp(input: SignUpInput!): SignUpResponse
     refreshToken(refreshToken: String!): AuthPayload!
     logout: Boolean!
   }
