@@ -27,27 +27,6 @@ import {
 } from '@mui/icons-material';
 
 // Define the mutations
-const SIGNUP_MUTATION = gql`
-  mutation signUp($input: SignUpInput!) {
-    signUp(input: $input) {
-      success
-      message
-      token
-      refreshToken
-      user {
-        id
-        email
-        emailVerified
-        firstName
-        lastName
-        phone
-        role
-        createdAt
-        updatedAt
-      }
-    }
-  }
-`;
 
 
 const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
