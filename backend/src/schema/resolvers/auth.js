@@ -67,7 +67,7 @@ const authResolvers = {
       }
     },
 
-    async signup(_, { input }, { db }) {
+    async Signup(_, { input }, { db }) {
       console.log('=== SIGNUP REQUEST START ===');
       console.log('Signup request received:', { email: input.email });
       
