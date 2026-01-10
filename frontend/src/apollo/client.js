@@ -8,7 +8,7 @@ const graphqlUri =
   process.env.REACT_APP_API_URL ||
   (process.env.NODE_ENV === 'development'
     ? 'http://localhost:4000/graphql'
-    : '/graphql');
+    : 'https://eaglevisionedge.com/.netlify/functions/graphql');
 
 // Create HTTP link
 const httpLink = createHttpLink({
