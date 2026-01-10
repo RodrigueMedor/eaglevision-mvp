@@ -10,8 +10,6 @@ const typeDefs = gql`
   type SignUpResponse implements SuccessResponse {
     success: Boolean!
     message: String
-    token: String
-    refreshToken: String
     user: User
   }
 

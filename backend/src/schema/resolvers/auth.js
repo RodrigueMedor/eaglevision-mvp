@@ -186,8 +186,6 @@ const authResolvers = {
         return {
           success: false,
           message: error.message || 'Failed to create user account. Please try again later.',
-          token: null,
-          refreshToken: null,
           user: null
         };
       }

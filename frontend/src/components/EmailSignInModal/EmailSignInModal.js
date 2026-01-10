@@ -48,13 +48,15 @@ const SIGNUP_MUTATION = gql`
     signUp(input: $input) {
       success
       message
-      token
-      refreshToken
       user {
         id
         email
         firstName
         lastName
+        emailVerified
+        phone
+        role
+        createdAt
       }
     }
   }
@@ -95,26 +97,23 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
       }
       
       if (data.signUp.success) {
-        // Handle successful signup
-        const token = data.signUp.token;
-        if (token) {
-          localStorage.setItem('token', token);
-          if (data.signUp.refreshToken) {
-            localStorage.setItem('refreshToken', data.signUp.refreshToken);
-          }
-          if (onSuccess) onSuccess(data.signUp.user || { email });
-          handleClose();
-        } else {
-          setError('Signup successful but no token received. Please try logging in.');
-        }
+        // Show success message
+        setSuccessMessage(data.signUp.message || 'Registration successful! Please log in.');
+        // Clear form
+        setEmail('');
         setPassword('');
         setFirstName('');
         setLastName('');
         setConfirmPassword('');
         setError('');
+        
+        // Switch to login tab
+        setActiveTab(0);
+        
       } else {
-        console.error('Server returned unsuccessful signup:', data.signup);
-        const errorMessage = data.signup.message || 'Failed to complete signup. Please try again.';
+        // Handle signup error
+        console.error('Server returned unsuccessful signup:', data.signUp);
+        const errorMessage = data.signUp.message || 'Failed to complete signup. Please try again.';
         setError(errorMessage);
         setSuccessMessage('');
       }
