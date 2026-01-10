@@ -4,16 +4,21 @@ import { onError } from '@apollo/client/link/error';
 import { RetryLink } from '@apollo/client/link/retry';
 
 // HTTP connection to the API - Use localhost during development; use relative path in production
-const graphqlUri =
-  process.env.REACT_APP_API_URL ||
-  (process.env.NODE_ENV === 'development'
-    ? 'http://localhost:4000/graphql'
-    : 'https://eaglevisionedge.com/.netlify/functions/graphql');
+const getGraphqlUri = () => {
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:4000/graphql';
+  }
+  // In production, use the Netlify function URL
+  return 'https://eaglevisionedge.com/.netlify/functions/graphql';
+};
 
 // Create HTTP link
 const httpLink = createHttpLink({
-  uri: graphqlUri,
-  credentials: 'include',
+  uri: getGraphqlUri(),
+  credentials: 'same-origin',
   fetchOptions: {
     mode: 'cors',
   },

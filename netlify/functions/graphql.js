@@ -42,12 +42,15 @@ const startServer = async () => {
   app.use(
     '/',
     cors({
-      origin: '*',
+      origin: [
+        'https://eaglevisionedge.com',
+        'http://localhost:3000'  // For local development
+      ],
       credentials: true,
-      methods: ['POST', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      methods: ['POST', 'OPTIONS', 'GET'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     }),
-    express.json(),
+    express.json({ limit: '10mb' }),
     expressMiddleware(server, {
       context: async ({ req }) => {
         // You can add authentication context here if needed
@@ -109,7 +112,7 @@ startServer()
   });
 
 // Netlify function handler
-exports.handler = async (event, context) => {
+module.exports.handler = async (event, context) => {
   // If the handler isn't ready yet, wait a bit
   if (!handler) {
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -132,11 +135,13 @@ exports.handler = async (event, context) => {
     // Handle preflight requests
     if (event.httpMethod === 'OPTIONS') {
       return {
-        statusCode: 204,
+        statusCode: 200,
         headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Origin': 'https://eaglevisionedge.com',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
+          'Access-Control-Allow-Credentials': 'true',
+          'Vary': 'Origin'
         },
         body: '',
       };
