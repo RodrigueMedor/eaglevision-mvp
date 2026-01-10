@@ -44,7 +44,7 @@ const LOGIN_MUTATION = gql`
 `;
 
 const SIGNUP_MUTATION = gql`
-  mutation Signup($input: SignUpInput!) {
+  mutation signup($input: SignUpInput!) {
     signup(input: $input) {
       success
       message
