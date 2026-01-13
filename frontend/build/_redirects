@@ -1,1 +1,8 @@
+# Route GraphQL to the Netlify function (supports POST)
+/graphql /.netlify/functions/graphql 200
+
+# Route API paths to functions
+/api/* /.netlify/functions/:splat 200
+
+# SPA fallback
 /* /index.html 200
