@@ -82,7 +82,7 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
     }
   });
 
-  const [signup] = useMutation(SIGNUP_MUTATION, {
+  const [signUp] = useMutation(SIGNUP_MUTATION, {
     onCompleted: (data) => {
       console.log('Signup response (onCompleted):', data);
       
@@ -292,7 +292,7 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
         password: '••••••' // Don't log actual password
       });
 
-      const result = await signup({
+      const result = await signUp({
         variables: {
           input: {
             email: email.toLowerCase().trim(),
