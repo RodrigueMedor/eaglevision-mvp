@@ -76,9 +76,32 @@ const authLink = setContext((_, { headers }) => {
 });
 
 // Create the Apollo Client instance
+// Create a logging link to track GraphQL operations
+const logLink = new ApolloLink((operation, forward) => {
+  console.log('GraphQL Operation:', {
+    operationName: operation.operationName,
+    query: operation.query.loc?.source?.body,
+    variables: operation.variables ? '*** variables present (hidden for security) ***' : 'none'
+  });
+  
+  return forward(operation).map((result) => {
+    console.log('GraphQL Result:', {
+      operationName: operation.operationName,
+      data: result.data ? '*** data received ***' : 'no data',
+      errors: result.errors ? '*** errors present ***' : 'no errors'
+    });
+    if (result.errors) {
+      console.error('GraphQL Errors:', result.errors);
+    }
+    return result;
+  });
+});
+
 const client = new ApolloClient({
-  link: ApolloLink.from([errorLink, authLink, retryLink, httpLink]),
-  cache: new InMemoryCache(),
+  link: ApolloLink.from([logLink, errorLink, authLink, retryLink, httpLink]),
+  cache: new InMemoryCache({
+    addTypename: false // This helps with debugging by not adding __typename to queries
+  }),
   defaultOptions: {
     watchQuery: {
       fetchPolicy: 'cache-first',
