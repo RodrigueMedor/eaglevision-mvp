@@ -7,7 +7,7 @@ const typeDefs = gql`
     user: User!
   }
 
-  type SignUpResponse implements SuccessResponse {
+  type SignUpResponse {
     success: Boolean!
     message: String
     user: User
