@@ -308,8 +308,8 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
       console.log('Signup response:', result);
 
       // Handle the response based on the server's structure
-      if (result.data?.signup?.success) {
-        const successMsg = result.data.signup.message || 'Account created successfully! Please sign in.';
+      if (result.data?.signUp?.success) {
+        const successMsg = result.data.signUp.message || 'Account created successfully! Please sign in.';
         console.log('Signup successful:', successMsg);
         
         setSuccessMessage(successMsg);
