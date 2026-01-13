@@ -139,40 +139,23 @@ const authResolvers = {
           return new Date().toISOString();
         };
         
-        // Generate tokens
-        const token = generateToken(userRef.id);
-        const refreshToken = generateRefreshToken(userRef.id);
+        // Get user data without password
+        const user = userDoc.data();
+        delete user.password;
 
-        // Save refresh token to database
-        await db.collection('refreshTokens').doc(refreshToken).set({
-          userId: userRef.id,
-          token: refreshToken,
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-          createdAt: Timestamp.now(),
-        });
-
-        // Prepare response with tokens
-        const response = {
+        // TODO: Send verification email here
+        console.log('=== SIGNUP REQUEST SUCCESS ===');
+        return {
           success: true,
-          message: 'User registered successfully',
-          token,
-          refreshToken,
+          message: 'Registration successful! Please check your email to verify your account.',
           user: {
             id: userRef.id,
-            email: userData.email,
-            emailVerified: userData.emailVerified || false,
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            role: userData.role,
-            phone: userData.phone,
-            createdAt: toISO(userData.createdAt),
-            updatedAt: toISO(userData.updatedAt)
+            ...user,
+            createdAt: toISO(user.createdAt),
+            updatedAt: toISO(user.updatedAt),
+            lastLoginAt: toISO(user.lastLoginAt)
           }
         };
-        
-        console.log('=== SIGNUP REQUEST COMPLETED SUCCESSFULLY ===', response);
-        return response;
-      
       } catch (error) {
         // Log the complete error with all available details
         console.error('SIGNUP ERROR:', {
