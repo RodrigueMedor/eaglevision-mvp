@@ -43,9 +43,10 @@ const LOGIN_MUTATION = gql`
   }
 `;
 
+// IMPORTANT: The mutation name 'signUp' must match exactly with the backend schema
 const SIGNUP_MUTATION = gql`
-  mutation SignUpMutation($input: SignUpInput!) {
-    signUp: signUp(input: $input) {
+  mutation SignUp($input: SignUpInput!) {
+    signUp(input: $input) {
       success
       message
       user {
@@ -55,7 +56,6 @@ const SIGNUP_MUTATION = gql`
         lastName
       }
     }
-  }
 `;
 // Define the mutations
 
