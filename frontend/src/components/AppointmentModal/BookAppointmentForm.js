@@ -19,6 +19,7 @@ import {
   FormHelperText,
   ListSubheader
 } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
 import { 
   CalendarMonth as CalendarIcon,
   Person as PersonIcon,
@@ -649,189 +650,47 @@ const BookAppointmentForm = ({ onClose, onSuccess }) => {
 
               {/* Time Slot */}
               <Grid item xs={12} sm={6}>
-                <FormControl 
-                  fullWidth 
-                  required 
-                  error={touched.time && !formData.time}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'primary.light',
-                      },
-                    },
+                <Autocomplete
+                  options={timeSlots}
+                  groupBy={(opt) => `${opt.period} Hours`}
+                  getOptionLabel={(opt) => opt.label}
+                  getOptionDisabled={(opt) => opt.disabled}
+                  value={timeSlots.find(t => t.value === formData.time) || null}
+                  onChange={(_, opt) => {
+                    setTouched(prev => ({ ...prev, time: true }));
+                    setFormData(prev => ({ ...prev, time: opt?.value || '' }));
+                    setError('');
                   }}
-                >
-                  <InputLabel 
-                    id="time-label"
-                    sx={{
-                      color: 'text.secondary',
-                      '&.Mui-focused': {
-                        color: 'primary.main',
-                      },
-                    }}
-                  >
-                    Preferred Time
-                  </InputLabel>
-                  <Select
-                    labelId="time-label"
-                    id="time"
-                    name="time"
-                    value={formData.time || ''}
-                    onChange={handleTimeChange}
-                    onBlur={() => setTouched(prev => ({ ...prev, time: true }))}
-                    label="Preferred Time"
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          maxHeight: 320,
-                          width: 250,
-                        },
-                      },
-                      MenuListProps: {
-                        sx: {
-                          '& .MuiMenuItem-root': {
-                            minHeight: 48,
-                            '&.Mui-selected': {
-                              backgroundColor: 'action.selected',
-                              '&:hover': {
-                                backgroundColor: 'action.hover',
-                              },
-                            },
-                          },
-                        },
-                      },
-                    }}
-                    sx={{
-                      '& .MuiSelect-select': {
-                        display: 'flex',
-                        alignItems: 'center',
-                        paddingLeft: '12px',
-                      },
-                    }}
-                    renderValue={(selected) => {
-                      const time = timeSlots.find(t => t.value === selected);
-                      return (
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          {time ? (
-                            <Typography variant="body1">{time.label}</Typography>
-                          ) : (
-                            <Typography variant="body2" color="text.secondary">Select a time</Typography>
-                          )}
-                        </Box>
-                      );
-                    }}
-                  >
-                    {Object.entries(timeSlotsGrouped).map(([period, times]) => {
-                      // Check if all time slots in this period are booked
-                      const allBooked = times.every(slot => slot.disabled);
-                      
-                      return (
-                        <React.Fragment key={`period-${period}`}>
-                          <ListSubheader 
-                            sx={{
-                              backgroundColor: 'background.paper',
-                              fontWeight: 'bold',
-                              color: allBooked ? 'text.disabled' : 'text.primary',
-                              lineHeight: '36px',
-                              borderBottom: '1px solid',
-                              borderColor: 'divider',
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <span>{period} Hours</span>
-                            {allBooked && (
-                              <Chip 
-                                label="Fully Booked" 
-                                size="small" 
-                                sx={{ 
-                                  fontSize: '0.65rem',
-                                  height: 20,
-                                  '& .MuiChip-label': {
-                                    px: 0.75,
-                                  },
-                                }} 
-                              />
-                            )}
-                          </ListSubheader>
-                          {times.map((time) => (
-                        <MenuItem 
-                          key={time.value} 
-                          value={time.value}
-                          disabled={time.disabled}
-                          onClick={(e) => {
-                            if (!time.disabled) {
-                              handleTimeChange({ target: { value: time.value } });
-                            }
-                          }}
-                          sx={{
-                            pl: 4,
-                            cursor: time.disabled ? 'not-allowed' : 'pointer',
-                            '&.Mui-disabled': {
-                              opacity: 1,
-                              color: 'text.disabled',
-                              backgroundColor: 'action.disabledBackground',
-                              textDecoration: 'line-through',
-                            },
-                            '&:hover:not(.Mui-disabled)': {
-                              backgroundColor: 'action.hover',
-                            },
-                          }}
-                        >
-                          <Box sx={{ 
-                            display: 'flex', 
-                            alignItems: 'center',
-                            width: '100%',
-                            justifyContent: 'space-between'
-                          }}>
-                            <Typography 
-                              variant="body1" 
-                              sx={{ 
-                                color: time.disabled ? 'text.disabled' : 'text.primary',
-                                fontWeight: time.disabled ? 400 : 500,
-                                position: 'relative',
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                '&:after': time.disabled ? {
-                                  content: '""',
-                                  position: 'absolute',
-                                  left: 0,
-                                  top: '50%',
-                                  width: '100%',
-                                  height: '1px',
-                                  backgroundColor: 'text.disabled',
-                                  transform: 'rotate(-5deg)'
-                                } : {}
-                              }}
-                            >
-                              {time.label.replace(' (Booked)', '')}
-                            </Typography>
-                            {formData.time === time.value ? (
-                              <CheckIcon color="primary" fontSize="small" sx={{ ml: 1 }} />
-                            ) : null}
-                          </Box>
-                        </MenuItem>
-                      ))}
-                      <Divider key={`divider-${period}`} sx={{ my: 0.5 }} />
-                        </React.Fragment>
-                      );
-                    })}
-                  </Select>
-                  {touched.time && !formData.time && (
-                    <FormHelperText error sx={{ ml: 2 }}>
-                      <Box component="span" display="flex" alignItems="center">
-                        <ErrorOutlineIcon fontSize="small" sx={{ mr: 0.5 }} />
-                        Please select a time
-                      </Box>
-                    </FormHelperText>
+                  onBlur={() => setTouched(prev => ({ ...prev, time: true }))}
+                  isOptionEqualToValue={(opt, val) => opt.value === val.value}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Preferred Time"
+                      required
+                      fullWidth
+                      error={touched.time && !formData.time}
+                      helperText={touched.time && !formData.time ? 'Please select a time' : ''}
+                    />
                   )}
-                </FormControl>
+                  renderGroup={(params) => (
+                    <li key={params.key}>
+                      <ListSubheader
+                        sx={{
+                          backgroundColor: 'background.paper',
+                          fontWeight: 'bold',
+                          lineHeight: '36px',
+                          borderBottom: '1px solid',
+                          borderColor: 'divider',
+                        }}
+                      >
+                        {params.group}
+                      </ListSubheader>
+                      {params.children}
+                      <Divider sx={{ my: 0.5 }} />
+                    </li>
+                  )}
+                />
               </Grid>
             
             {/* Additional Notes */}
