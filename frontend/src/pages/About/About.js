@@ -310,8 +310,8 @@ const About = () => {
               
               <Box sx={{ mt: 4 }}>
                 <Button
-                  component={Link}
-                  to="/services"
+                  component="a"
+                  href="https://eaglevisionedge.com/services"
                   variant="contained"
                   color="primary"
                   size="large"
@@ -377,8 +377,8 @@ const About = () => {
             </Button>
             
             <Button
-              component={Link}
-              to="/contact"
+              component="a"
+              href="https://eaglevisionedge.com/contact"
               variant="outlined"
               color="primary"
               size="large"
