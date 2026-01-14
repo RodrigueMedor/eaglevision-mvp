@@ -273,10 +273,6 @@ const withAuth = (resolver) => {
 
 // Export the resolvers with proper structure
 module.exports = {
-  authResolvers: {
-    Mutation: {
-      ...authResolvers.Mutation
-    }
-  },
-  withAuth
+  authResolvers,
+  withAuth,
 };
