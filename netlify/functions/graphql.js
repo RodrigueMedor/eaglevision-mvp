@@ -4,7 +4,7 @@ const { expressMiddleware } = require('@apollo/server/express4');
 const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer');
 const serverless = require('serverless-http');
 const cors = require('cors');
-const { typeDefs, resolvers } = require('../../backend/src/schema');
+const { typeDefs, resolvers } = require('../../backend/src/schema/index.js');
 const firebase = require('../../backend/src/firebase');
 
 // Create express app
