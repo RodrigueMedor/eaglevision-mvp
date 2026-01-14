@@ -130,7 +130,7 @@ status = 200
       style-src 'self' 'unsafe-inline';
       img-src 'self' data: https: https://*.docusign.net;
       font-src 'self' data: https:;
-      connect-src 'self' https://eaglevisionedge.com/.netlify/functions/ https://*.google-analytics.com https://*.docusign.net https://*.docusign.com;
+      connect-src 'self' https://eaglevisionedge.com/.netlify/functions/ https://*.google-analytics.com https://*.docusign.net https://*.docusign.com https://firestore.googleapis.com https://*.googleapis.com https://www.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://*.firebaseio.com;
       frame-ancestors 'none';
     """
     Referrer-Policy = "same-origin"
