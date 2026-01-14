@@ -178,6 +178,18 @@ const About = () => {
           <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 600, color: 'primary.main', mb: 6, textAlign: 'center' }}>
             Meet Our Team
           </Typography>
+          <Box
+            component="img"
+            src={`${process.env.PUBLIC_URL || ''}/images/meet-our-team-temp.svg`}
+            alt="Meet Our Team"
+            sx={{
+              width: '100%',
+              height: 'auto',
+              borderRadius: 2,
+              boxShadow: 2,
+              mb: 4
+            }}
+          />
           <Grid container spacing={4} justifyContent="center">
             {team.map((member, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>
@@ -207,16 +219,14 @@ const About = () => {
                     }}
                   >
                     <img 
-                      src={member.image} 
+                      src={`${process.env.PUBLIC_URL || ''}${member.image}`} 
                       alt={member.name} 
+                      onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = `${process.env.PUBLIC_URL || ''}/images/meet-our-team-temp.svg`; }}
                       style={{ 
                         width: '100%', 
                         height: '100%', 
                         objectFit: 'cover',
                         transition: 'transform 0.5s',
-                        '&:hover': {
-                          transform: 'scale(1.1)',
-                        },
                       }} 
                     />
                   </Box>
