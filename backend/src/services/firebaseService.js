@@ -1,16 +1,9 @@
-const { initializeApp, cert } = require('firebase-admin/app');
-const { getFirestore, Timestamp, FieldValue } = require('firebase-admin/firestore');
+const { Timestamp, FieldValue } = require('firebase-admin/firestore');
 
-// Initialize Firebase Admin
-const serviceAccount = require('../../config/firebase/serviceAccountKey.json');
-
-// Initialize Firebase Admin SDK
-const app = initializeApp({
-  credential: cert(serviceAccount),
-  databaseURL: `https://${serviceAccount.project_id}.firebaseio.com`
-});
-
-const db = getFirestore(app);
+// Use centralized Firebase initialization (env-based)
+const firebase = require('../firebase');
+firebase.initialize();
+const db = firebase.db;
 
 // Helper function to convert Firestore timestamps to ISO strings
 const convertTimestamps = (doc) => {
