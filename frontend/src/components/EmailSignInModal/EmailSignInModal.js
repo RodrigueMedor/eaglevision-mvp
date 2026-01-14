@@ -56,6 +56,7 @@ const SIGNUP_MUTATION = gql`
         lastName
       }
     }
+  }
 `;
 // Define the mutations
 
