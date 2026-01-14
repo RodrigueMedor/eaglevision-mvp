@@ -8,7 +8,7 @@ const team = [
     name: 'Rodrigue Medor',
     role: 'Founder & Tax Professional',
     bio: 'With a passion for helping individuals and small businesses navigate the complexities of tax preparation and business registration, Rod brings a personal touch to every client interaction.',
-    image: '/images/ai-rodrigue-medor.jpg', // AI-generated professional photo
+    image: '/images/ai-rodrigue-medor.svg', // AI-generated professional photo
     linkedin: 'https://www.linkedin.com/in/rodriguemedor',
     email: 'rod@eaglevisionedge.com'
   },
@@ -16,7 +16,7 @@ const team = [
     name: 'Our Professional Network',
     role: 'Trusted Partners & Specialists',
     bio: 'We collaborate with a curated network of certified professionals including CPAs, immigration attorneys, and business consultants to deliver comprehensive solutions. Our partners are carefully selected for their expertise and commitment to excellence, ensuring you receive the highest quality service across all your financial and legal needs.',
-    image: '/images/ai-professional-network.jpg', // Professional network image
+    image: '/images/ai-professional-network.svg', // Professional network image
     linkedin: 'https://www.linkedin.com/company/eagle-vision-edge',
     email: 'partners@eaglevisionedge.com'
   }
@@ -178,18 +178,6 @@ const About = () => {
           <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 600, color: 'primary.main', mb: 6, textAlign: 'center' }}>
             Meet Our Team
           </Typography>
-          <Box
-            component="img"
-            src={`${process.env.PUBLIC_URL || ''}/images/meet-our-team-temp.svg`}
-            alt="Meet Our Team"
-            sx={{
-              width: '100%',
-              height: 'auto',
-              borderRadius: 2,
-              boxShadow: 2,
-              mb: 4
-            }}
-          />
           <Grid container spacing={4} justifyContent="center">
             {team.map((member, index) => (
               <Grid item xs={12} sm={6} md={4} key={index}>

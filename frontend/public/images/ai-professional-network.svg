@@ -1,0 +1,18 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B5DB5"/>
+      <stop offset="100%" stop-color="#1177D1"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="32" fill="url(#bg2)"/>
+  <g fill="#E6F0FA">
+    <circle cx="170" cy="220" r="56"/>
+    <circle cx="342" cy="220" r="56"/>
+    <circle cx="256" cy="172" r="60"/>
+    <path d="M84 416c12-52 64-88 120-88"/>
+    <path d="M428 416c-12-52-64-88-120-88"/>
+    <path d="M136 416c18-66 74-112 120-112s102 46 120 112"/>
+  </g>
+  <text x="256" y="420" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="600" fill="#E6F0FA">Professional Network</text>
+</svg>
