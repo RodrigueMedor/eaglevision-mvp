@@ -684,11 +684,6 @@ const BookAppointmentForm = ({ onClose, onSuccess }) => {
                     onChange={handleTimeChange}
                     onBlur={() => setTouched(prev => ({ ...prev, time: true }))}
                     label="Preferred Time"
-                    startAdornment={
-                      <InputAdornment position="start" sx={{ ml: 1 }}>
-                        <AccessTimeIcon color={formData.time ? 'primary' : 'action'} />
-                      </InputAdornment>
-                    }
                     MenuProps={{
                       PaperProps: {
                         style: {
@@ -714,15 +709,18 @@ const BookAppointmentForm = ({ onClose, onSuccess }) => {
                       '& .MuiSelect-select': {
                         display: 'flex',
                         alignItems: 'center',
-                        paddingLeft: '8px',
+                        paddingLeft: '12px',
                       },
                     }}
                     renderValue={(selected) => {
                       const time = timeSlots.find(t => t.value === selected);
                       return (
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <AccessTimeIcon sx={{ color: 'primary.main', mr: 1, fontSize: '1.25rem' }} />
-                          <Typography variant="body1">{time ? time.label : 'Select a time'}</Typography>
+                          {time ? (
+                            <Typography variant="body1">{time.label}</Typography>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">Select a time</Typography>
+                          )}
                         </Box>
                       );
                     }}
@@ -791,39 +789,29 @@ const BookAppointmentForm = ({ onClose, onSuccess }) => {
                             width: '100%',
                             justifyContent: 'space-between'
                           }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                              <AccessTimeIcon 
-                                sx={{ 
-                                  color: time.disabled ? 'text.disabled' : 'primary.main', 
-                                  mr: 1.5,
-                                  fontSize: '1.1rem',
-                                  flexShrink: 0
-                                }} 
-                              />
-                              <Typography 
-                                variant="body1" 
-                                sx={{ 
-                                  color: time.disabled ? 'text.disabled' : 'text.primary',
-                                  fontWeight: time.disabled ? 400 : 500,
-                                  position: 'relative',
-                                  whiteSpace: 'nowrap',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  '&:after': time.disabled ? {
-                                    content: '""',
-                                    position: 'absolute',
-                                    left: 0,
-                                    top: '50%',
-                                    width: '100%',
-                                    height: '1px',
-                                    backgroundColor: 'text.disabled',
-                                    transform: 'rotate(-5deg)'
-                                  } : {}
-                                }}
-                              >
-                                {time.label.replace(' (Booked)', '')}
-                              </Typography>
-                            </Box>
+                            <Typography 
+                              variant="body1" 
+                              sx={{ 
+                                color: time.disabled ? 'text.disabled' : 'text.primary',
+                                fontWeight: time.disabled ? 400 : 500,
+                                position: 'relative',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                '&:after': time.disabled ? {
+                                  content: '""',
+                                  position: 'absolute',
+                                  left: 0,
+                                  top: '50%',
+                                  width: '100%',
+                                  height: '1px',
+                                  backgroundColor: 'text.disabled',
+                                  transform: 'rotate(-5deg)'
+                                } : {}
+                              }}
+                            >
+                              {time.label.replace(' (Booked)', '')}
+                            </Typography>
                             {formData.time === time.value ? (
                               <CheckIcon color="primary" fontSize="small" sx={{ ml: 1 }} />
                             ) : null}
