@@ -47,6 +47,8 @@ const LOGIN_MUTATION = gql`
 const SIGNUP_MUTATION = gql`
   mutation SignUp($input: SignUpInput!) {
     signUp(input: $input) {
+      success
+      message
       user {
         id
         email
@@ -321,7 +323,7 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
         setLastName('');
         setConfirmPassword('');
       } else {
-        const errorMsg = result.data?.signup?.message || 'Failed to complete signup. Please try again.';
+        const errorMsg = result.data?.signUp?.message || 'Failed to complete signup. Please try again.';
         console.error('Signup failed:', errorMsg);
         setError(errorMsg);
       }
