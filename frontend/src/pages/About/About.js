@@ -8,7 +8,7 @@ const team = [
     name: 'Rodrigue Medor',
     role: 'Founder & Tax Professional',
     bio: 'With a passion for helping individuals and small businesses navigate the complexities of tax preparation and business registration, Rod brings a personal touch to every client interaction.',
-    image: '/images/ai-rodrigue-medor.svg', // AI-generated professional photo
+    image: '/images/rodrigue-medor.jpg', // Real headshot to be provided
     linkedin: 'https://www.linkedin.com/in/rodriguemedor',
     email: 'rod@eaglevisionedge.com'
   },
@@ -16,7 +16,7 @@ const team = [
     name: 'Our Professional Network',
     role: 'Trusted Partners & Specialists',
     bio: 'We collaborate with a curated network of certified professionals including CPAs, immigration attorneys, and business consultants to deliver comprehensive solutions. Our partners are carefully selected for their expertise and commitment to excellence, ensuring you receive the highest quality service across all your financial and legal needs.',
-    image: '/images/ai-professional-network.svg', // Professional network image
+    image: '/images/professional-network.jpg', // Network visual to be provided
     linkedin: 'https://www.linkedin.com/company/eagle-vision-edge',
     email: 'partners@eaglevisionedge.com'
   }
@@ -207,9 +207,17 @@ const About = () => {
                     }}
                   >
                     <img 
-                      src={`${process.env.PUBLIC_URL || ''}${member.image}`} 
+                      src={member.image && (member.image.startsWith('http://') || member.image.startsWith('https://'))
+                        ? member.image
+                        : `${process.env.PUBLIC_URL || ''}${member.image}`}
                       alt={member.name} 
-                      onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = `${process.env.PUBLIC_URL || ''}/images/meet-our-team-temp.svg`; }}
+                      onError={(e) => { 
+                        e.currentTarget.onerror = null; 
+                        const fallback = member.name === 'Rodrigue Medor' 
+                          ? `${process.env.PUBLIC_URL || ''}/images/ai-rodrigue-medor.svg` 
+                          : `${process.env.PUBLIC_URL || ''}/images/ai-professional-network.svg`;
+                        e.currentTarget.src = fallback; 
+                      }}
                       style={{ 
                         width: '100%', 
                         height: '100%', 
