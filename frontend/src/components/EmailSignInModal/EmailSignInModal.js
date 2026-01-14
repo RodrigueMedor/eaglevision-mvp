@@ -93,7 +93,11 @@ const EmailSignInModal = ({ open, onClose, onEmailSubmit, onSuccess }) => {
         return;
       }
       
-      if (data.signUp.success) {
+      const succeeded = typeof data.signUp.success === 'boolean'
+        ? data.signUp.success
+        : Boolean(data.signUp.user);
+
+      if (succeeded) {
         // Show success message
         setSuccessMessage(data.signUp.message || 'Registration successful! Please log in.');
         // Clear form
